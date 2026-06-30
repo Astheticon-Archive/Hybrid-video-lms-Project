@@ -1,0 +1,57 @@
+name: Lint Codebase
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-python:
+    name: Lint Python (Talking Head Service)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Linting dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort
+
+      - name: Run Black formatter check
+        run: black --check services/talking-head-service/src
+
+      - name: Run Isort import order check
+        run: isort --check-only services/talking-head-service/src
+
+      - name: Run Flake8 lint
+        run: flake8 services/talking-head-service/src --count --select=E9,F63,F7,F82 --show-source --statistics
+
+  lint-javascript:
+    name: Lint JavaScript/TypeScript (Animation Service)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/animation-service/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd services/animation-service
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      # We can configure this step once the animation-service is fully configured with package.json
+      # - name: Run Linting / Format Checks
+      #   run: |
+      #     cd services/animation-service
+      #     npm run lint

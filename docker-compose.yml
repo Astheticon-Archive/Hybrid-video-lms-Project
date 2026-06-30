@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  talking-head-service:
+    build:
+      context: ./services/talking-head-service
+      dockerfile: Dockerfile
+    container_name: talking-head-service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./services/talking-head-service:/app
+      - ./shared:/app/shared
+      - ./examples:/app/examples
+    environment:
+      - ENV=development
+      - PORT=8000
+      # If GPU acceleration is available, uncomment deploy section below
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    restart: unless-stopped
+
+  animation-service:
+    build:
+      context: ./services/animation-service
+      dockerfile: Dockerfile
+    container_name: animation-service
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./services/animation-service:/app
+      - ./shared:/app/shared
+      - ./examples:/app/examples
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    depends_on:
+      - talking-head-service
+    restart: unless-stopped

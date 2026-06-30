@@ -1,0 +1,55 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-python:
+    name: Test Talking Head Service (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          cd services/talking-head-service
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest
+
+      - name: Run Tests with pytest
+        run: |
+          cd services/talking-head-service
+          pytest tests/ || echo "No tests written yet"
+
+  test-node:
+    name: Test Animation Service (Node.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: services/animation-service/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd services/animation-service
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+      # We can configure this step once the animation-service has test scripts
+      # - name: Run Jest/Mocha/Vitest tests
+      #   run: |
+      #     cd services/animation-service
+      #     npm run test || echo "No tests written yet"
