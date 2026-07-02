@@ -1,0 +1,17 @@
+import {makeScene2D} from '@revideo/core';
+import {Txt, Rect, Layout, Txt} from '@revideo/2d';
+import {createRef, waitFor} from '@revideo/core';
+
+// This is a placeholder for the actual reusable component
+export const Terminal = ({command, output}: {command: string, output: string[]}) => {
+  return (
+    <Layout>
+      <Rect fill={'#1e1e1e'} padding={20} radius={10}>
+        <Txt text={`$ ${command}`} fill={'white'} fontFamily={'monospace'} />
+        <Layout direction={'column'} marginTop={10}>
+            {output.map((line, i) => <Txt key={i} text={line} fill={'#cccccc'} fontFamily={'monospace'} />)}
+        </Layout>
+      </Rect>
+    </Layout>
+  );
+};

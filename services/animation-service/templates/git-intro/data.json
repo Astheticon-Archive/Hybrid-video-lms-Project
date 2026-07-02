@@ -1,0 +1,4 @@
+{
+  "command": "git intro",
+  "output": ["Welcome to Git!"]
+}

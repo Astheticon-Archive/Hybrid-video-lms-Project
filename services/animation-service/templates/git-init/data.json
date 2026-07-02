@@ -1,0 +1,6 @@
+{
+  "command": "git init",
+  "output": [
+    "Initialized empty Git repository in /path/to/repo/.git/"
+  ]
+}

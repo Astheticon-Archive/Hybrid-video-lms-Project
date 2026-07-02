@@ -1,0 +1,4 @@
+{
+  "command": "git merge feature-x",
+  "output": ["Updating a1b2c3d..e4f5g6h", "Fast-forward"]
+}

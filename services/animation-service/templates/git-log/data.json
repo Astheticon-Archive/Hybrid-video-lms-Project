@@ -1,0 +1,10 @@
+{
+  "command": "git log",
+  "output": [
+    "commit a1b2c3d",
+    "Author: User <user@example.com>",
+    "Date:   Thu Jul 2 12:00:00 2026",
+    "",
+    "    Initial commit"
+  ]
+}

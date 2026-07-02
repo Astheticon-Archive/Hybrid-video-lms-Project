@@ -1,0 +1,7 @@
+{
+  "command": "git commit -m \"Initial commit\"",
+  "output": [
+    "[main (root-commit) a1b2c3d] Initial commit",
+    "1 file changed, 1 insertion(+)"
+  ]
+}

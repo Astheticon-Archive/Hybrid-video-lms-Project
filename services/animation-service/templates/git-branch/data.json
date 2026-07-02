@@ -1,0 +1,4 @@
+{
+  "command": "git branch feature-x",
+  "output": []
+}

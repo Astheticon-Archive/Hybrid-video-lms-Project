@@ -1,0 +1,4 @@
+{
+  "command": "git switch feature-x",
+  "output": ["Switched to branch 'feature-x'"]
+}
