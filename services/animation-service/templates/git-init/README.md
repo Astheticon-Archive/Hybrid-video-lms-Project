@@ -1,8 +1,20 @@
 # Git Init Template
 
-This template animates the `git init` command, showing the command typing and the output.
+## Description
+This template demonstrates the `git init` command using a terminal-style animation.
 
-## Usage
+## Files
+- `component.tsx` – Terminal UI component
+- `scene.tsx` – Animation scene
+- `data.json` – Sample input data
+- `README.md` – Template documentation
 
-Update `data.json` to change the command output.
-The `scene.tsx` renders the animation using the `Terminal` component from `component.tsx`.
+## Sample JSON
+
+```json
+{
+  "command": "git init",
+  "output": [
+    "Initialized empty Git repository in /path/to/repo/.git/"
+  ]
+}
