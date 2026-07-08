@@ -1,8 +1,8 @@
-import {makeScene2D} from '@revideo/core';
+import { makeScene2D } from '@revideo/2d';
+import { waitFor } from '@revideo/core';
 import {Terminal} from './component';
-import {waitFor} from '@revideo/core';
 
-export default makeScene2D(function* (view) {
+export default makeScene2D('git-init', function* (view) {
   const data = {
     command: 'git init',
     output: ['Initialized empty Git repository in /path/to/repo/.git/']

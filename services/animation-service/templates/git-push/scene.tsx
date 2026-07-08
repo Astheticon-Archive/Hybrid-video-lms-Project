@@ -1,7 +1,8 @@
-import {makeScene2D, waitFor} from '@revideo/core';
+import { makeScene2D } from '@revideo/2d';
+import { waitFor } from '@revideo/core';
 import {Terminal} from './component';
 
-export default makeScene2D(function* (view) {
+export default makeScene2D('git-push', function* (view) {
   const data = {
     command: 'git push',
     output: ['Enumerating objects: 3, done.', 'Total 3 (delta 0), reused 0 (delta 0), pack-reused 0', 'To github.com:user/repo.git', ' * [new branch]      main -> main']

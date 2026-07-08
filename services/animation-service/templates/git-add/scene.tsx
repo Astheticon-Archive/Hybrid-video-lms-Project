@@ -1,7 +1,8 @@
-import {makeScene2D, waitFor} from '@revideo/core';
+import { makeScene2D } from '@revideo/2d';
+import { waitFor } from '@revideo/core';
 import {Terminal} from './component';
 
-export default makeScene2D(function* (view) {
+export default makeScene2D('git-add', function* (view) {
   const data = {
     command: 'git add .',
     output: [
