@@ -14,5 +14,12 @@ This template demonstrates the `git add .` command using a terminal-style animat
 ```json
 {
   "command": "git add .",
-  "output": []
+  "output": [
+    "Staging files...",
+    "README.md",
+    "component.tsx",
+    "scene.tsx",
+    "data.json",
+    "Done."
+  ]
 }

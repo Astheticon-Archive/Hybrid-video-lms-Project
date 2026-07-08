@@ -15,6 +15,7 @@ This template demonstrates the `git init` command using a terminal-style animati
 {
   "command": "git init",
   "output": [
-    "Initialized empty Git repository in /path/to/repo/.git/"
+    "Initialized empty Git repository in C:/Users/User/project/.git/"
   ]
 }
+

@@ -13,6 +13,11 @@ This template demonstrates the `git branch` . command using a terminal-style ani
 
 ```json
 {
-  "command": "git branch feature-x",
-  "output": []
+  "command": "git branch",
+  "output": [
+    "* main",
+    "docs-testing",
+    "feature/git-animation",
+    "feature/subtitles"
+  ]
 }

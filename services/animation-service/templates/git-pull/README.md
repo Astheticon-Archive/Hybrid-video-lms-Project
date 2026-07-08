@@ -13,6 +13,10 @@ This template demonstrates the `git pull` command using a terminal-style animati
 
 ```json
 {
-  "command": "git pull",
-  "output": ["Already up to date."]
+  "command": "git pull origin main",
+  "output": [
+    "From https://github.com/example/project",
+    "* branch            main       -> FETCH_HEAD",
+    "Already up to date."
+  ]
 }

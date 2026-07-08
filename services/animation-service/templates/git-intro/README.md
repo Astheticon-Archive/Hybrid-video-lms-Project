@@ -13,7 +13,9 @@ This template demonstrates the `git intro` command using a terminal-style animat
 
 ```json
 {
-  "command": "git intro",
-  "output": ["Welcome to Git!"]
+  "command": "git --version",
+  "output": [
+    "git version 2.49.0.windows.1"
+  ]
 }
 

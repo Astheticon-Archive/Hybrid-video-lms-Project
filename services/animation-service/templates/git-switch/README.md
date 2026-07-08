@@ -13,6 +13,8 @@ This template demonstrates the `git switch` command using a terminal-style anima
 
 ```json
 {
-  "command": "git switch feature-x",
-  "output": ["Switched to branch 'feature-x'"]
+  "command": "git switch feature/git-animation",
+  "output": [
+    "Switched to branch 'feature/git-animation'"
+  ]
 }

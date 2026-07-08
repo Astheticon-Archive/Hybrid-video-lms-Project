@@ -13,12 +13,10 @@ This template demonstrates the `git log` command using a terminal-style animatio
 
 ```json
 {
-  "command": "git log",
+  "command": "git log --oneline",
   "output": [
-    "commit a1b2c3d",
-    "Author: User <user@example.com>",
-    "Date:   Thu Jul 2 12:00:00 2026",
-    "",
-    "    Initial commit"
+    "e5f6g7h Added subtitles",
+    "c3d4e5f Added Git animations",
+    "a1b2c3d Initial project setup"
   ]
 }

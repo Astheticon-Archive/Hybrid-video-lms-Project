@@ -13,6 +13,11 @@ This template demonstrates the `git merge` command using a terminal-style animat
 
 ```json
 {
-  "command": "git merge feature-x",
-  "output": ["Updating a1b2c3d..e4f5g6h", "Fast-forward"]
+  "command": "git merge feature/subtitles",
+  "output": [
+    "Updating a1b2c3d..e5f6g7h",
+    "Fast-forward",
+    " subtitles.srt | 120 +++++++++++++++++++++++++",
+    " 1 file changed, 120 insertions(+)"
+  ]
 }

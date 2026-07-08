@@ -14,6 +14,10 @@ This template demonstrates the `git status` command using a terminal-style anima
 ```json
 {
   "command": "git status",
-  "output": ["On branch main", "nothing to commit, working tree clean"]
+  "output": [
+    "On branch main",
+    "Your branch is up to date with 'origin/main'.",
+    "",
+    "nothing to commit, working tree clean"
+  ]
 }
-

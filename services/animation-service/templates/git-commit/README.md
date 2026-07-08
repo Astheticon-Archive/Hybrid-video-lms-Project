@@ -13,9 +13,12 @@ This template demonstrates the `git commit` command using a terminal-style anima
 
 ```json
 {
-  "command": "git commit -m \"Initial commit\"",
+  "command": "git commit -m \"Initial project setup\"",
   "output": [
-    "[main (root-commit) a1b2c3d] Initial commit",
-    "1 file changed, 1 insertion(+)"
+    "[main a1b2c3d] Initial project setup",
+    "5 files changed, 120 insertions(+)",
+    "create mode 100644 README.md",
+    "create mode 100644 component.tsx",
+    "create mode 100644 scene.tsx"
   ]
 }

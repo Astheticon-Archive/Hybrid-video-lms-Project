@@ -4,7 +4,9 @@ import {Terminal} from './component';
 export default makeScene2D(function* (view) {
   const data = {
     command: 'git add .',
-    output: []
+    output: [
+      "Changes staged successfully"
+    ]
   };
 
   view.add(<Terminal command={data.command} output={data.output} />);
