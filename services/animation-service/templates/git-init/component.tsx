@@ -1,16 +1,41 @@
-import {Txt, Rect, Layout, } from '@revideo/2d';
-import {createRef, waitFor} from '@revideo/core';
+import { Layout, Rect, Txt } from "@revideo/2d";
 
-// This is a placeholder for the actual reusable component
-export const Terminal = ({command, output}: {command: string, output: string[]}) => {
-  return (
-    <Layout>
-      <Rect fill={'#1e1e1e'} padding={20} radius={10}>
-        <Txt text={`$ ${command}`} fill={'white'} fontFamily={'monospace'} />
-        <Layout direction={'column'} marginTop={10}>
-            {output.map((line, i) => <Txt key={i.toString()} text={line} fill={'#cccccc'} fontFamily={'monospace'} />)}
-        </Layout>
-      </Rect>
-    </Layout>
-  );
-};
+export const Terminal = ({
+  command,
+  output,
+}: {
+  command: string;
+  output: string[];
+}) => (
+  <Layout width={1920} height={1080}>
+    <Rect
+      width={1920}
+      height={1080}
+      fill={"#000000"}
+      radius={20}
+    />
+
+    <Txt
+  x={0}
+  y={-420}
+  text={`$ ${command}`}
+  fill={"white"}
+  fontFamily={"monospace"}
+  fontSize={42}
+  textAlign={"center"}
+/>
+
+{output.map((line, i) => (
+  <Txt
+    key={i.toString()}
+    x={0}
+    y={-360 + i * 50}
+    text={line}
+    fill={"#cccccc"}
+    fontFamily={"monospace"}
+    fontSize={36}
+    textAlign={"center"}
+  />
+))}
+  </Layout>
+);

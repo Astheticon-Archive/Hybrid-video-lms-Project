@@ -1,4 +1,4 @@
-import { makeScene2D } from '@revideo/2d';
+import { makeScene2D, Txt } from '@revideo/2d';
 import { waitFor } from '@revideo/core';
 import {Terminal} from './component';
 
@@ -7,7 +7,22 @@ export default makeScene2D('git-intro', function* (view) {
     command: 'git intro',
     output: ['Welcome to Git!']
   };
+  const subtitle = "Git is a distributed version control system.";
 
-  view.add(<Terminal command={data.command} output={data.output} />);
+  view.add(
+  <>
+    <Terminal
+      command={data.command}
+      output={data.output}
+    />
+    <Txt
+      text={subtitle}
+      y={420}
+      fill={"white"}
+      fontFamily={"monospace"}
+      fontSize={36}
+    />
+  </>
+);
   yield* waitFor(2);
 });
