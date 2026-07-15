@@ -8,6 +8,9 @@ async function render() {
       projectFile: "./src/project.tsx",
       settings: {
         logProgress: true,
+        puppeteer: {
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        }
       },
     });
 

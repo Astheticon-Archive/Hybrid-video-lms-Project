@@ -74,4 +74,8 @@ services/animation-service/output.mp4
 services/animation-service/public/assets/audio_*
 services/animation-service/public/assets/frames_*
 services/animation-service/public/outputs/*
+services/animation-service/public/assets/audio/
+services/animation-service/public/assets/final_audio_*
+services/animation-service/public/assets/final_video_*
+services/animation-service/templates/rag/output/
 

@@ -19,6 +19,12 @@ const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve testing sandbox as the default homepage
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/test.html'));
+});
+
 app.use(express.static(path.join(__dirname, '../public')));
 
 // In-memory render job database
@@ -27,17 +33,43 @@ const jobsDb = new Map();
 const API_KEY = process.env.SARVAM_API_KEY || "sk_y25zfvvc_WhWlL0w3VjvolJikQyqJnHL0";
 
 const celebrityVoiceMap = {
+  // Male
   'shahrukh': { speaker: 'aditya', language_code: 'en-IN' },
   'shahrukhkhan': { speaker: 'aditya', language_code: 'en-IN' },
   'sharukh': { speaker: 'aditya', language_code: 'en-IN' },
   'srk': { speaker: 'aditya', language_code: 'en-IN' },
   'ntr': { speaker: 'shubh', language_code: 'en-IN' },
   'ntrjr': { speaker: 'shubh', language_code: 'en-IN' },
-  'jrntr': { speaker: 'shubh', language_code: 'en-IN' }
+  'jrntr': { speaker: 'shubh', language_code: 'en-IN' },
+  // Female
+  'deepika': { speaker: 'shreya', language_code: 'en-IN' },
+  'deepikapadukone': { speaker: 'shreya', language_code: 'en-IN' },
+  'priyanka': { speaker: 'shreya', language_code: 'en-IN' },
+  'priyankachopra': { speaker: 'shreya', language_code: 'en-IN' },
+  'katrina': { speaker: 'shreya', language_code: 'en-IN' },
+  'katrinakaif': { speaker: 'shreya', language_code: 'en-IN' },
+  'alia': { speaker: 'shreya', language_code: 'en-IN' },
+  'aliabhatt': { speaker: 'shreya', language_code: 'en-IN' },
+  'rashmika': { speaker: 'shreya', language_code: 'en-IN' },
+  'rashmikamandanna': { speaker: 'shreya', language_code: 'en-IN' },
+  'nayanthara': { speaker: 'shreya', language_code: 'en-IN' },
+  'madhuri': { speaker: 'shreya', language_code: 'en-IN' },
+  'madhuridixit': { speaker: 'shreya', language_code: 'en-IN' },
+  'kareena': { speaker: 'shreya', language_code: 'en-IN' },
+  'kareenakapoor': { speaker: 'shreya', language_code: 'en-IN' },
+  'shraddha': { speaker: 'shreya', language_code: 'en-IN' },
+  'shraddhakapoor': { speaker: 'shreya', language_code: 'en-IN' },
+  'aruna': { speaker: 'shreya', language_code: 'en-IN' }
 };
 
-function getCelebrityVoice(name) {
-  if (!name) return { speaker: 'aditya', language_code: 'en-IN' };
+function getCelebrityVoice(name, gender) {
+  const defaultMale = { speaker: 'aditya', language_code: 'en-IN' };
+  const defaultFemale = { speaker: 'shreya', language_code: 'en-IN' };
+  
+  if (!name) {
+    return gender === 'female' ? defaultFemale : defaultMale;
+  }
+  
   const normalized = name.toLowerCase().trim().replace(/[^a-z]/g, '');
   if (celebrityVoiceMap[normalized]) {
     return celebrityVoiceMap[normalized];
@@ -47,7 +79,18 @@ function getCelebrityVoice(name) {
       return celebrityVoiceMap[key];
     }
   }
-  return { speaker: 'aditya', language_code: 'en-IN' };
+  
+  if (gender === 'female') {
+    return defaultFemale;
+  }
+  
+  const femaleCelebrities = ['deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika', 'nayanthara', 'female', 'aruna'];
+  const isFemale = femaleCelebrities.some(item => normalized.includes(item));
+  if (isFemale) {
+    return defaultFemale;
+  }
+  
+  return defaultMale;
 }
 
 // Helper: fetch with retry and rate limit (429) backoff
@@ -294,6 +337,18 @@ async function runRenderPipeline(jobId, speaker, languageCode) {
     job.completed_at = new Date().toISOString();
     job.output_url = `/outputs/video_${jobId}.mp4`;
     jobsDb.set(jobId, { ...job });
+
+    // Populate pre-rendered cache if it doesn't exist yet
+    const cachePath = path.join(OUTPUT_DIR, `video_${job.course}_${job.gender}.mp4`);
+    if (!fs.existsSync(cachePath)) {
+      console.log(`\x1b[32m[Cache Write]\x1b[0m Job ID: ${jobId} | Populating cache for ${job.course} (${job.gender})`);
+      try {
+        fs.copyFileSync(finalOutputMp4, cachePath);
+      } catch (cacheErr) {
+        console.error(`Failed to write cache file: ${cacheErr.message}`);
+      }
+    }
+
     console.log(`\x1b[32m[Job Completed]\x1b[0m Job ID: ${jobId} | Video generated successfully at: public/outputs/video_${jobId}.mp4\n`);
   } catch (err) {
     console.error(`\x1b[31m[Job Failed]\x1b[0m Job ID: ${jobId} | Error:`, err);
@@ -323,7 +378,7 @@ app.get('/api/job/:jobId/config.js', (req, res) => {
 
 // Create video generation job
 app.post('/api/v1/course/generate', (req, res) => {
-  const { celebrity, course } = req.body;
+  const { celebrity, course, gender } = req.body;
   if (!celebrity) {
     return res.status(400).json({ error: 'Missing celebrity name in request body.' });
   }
@@ -334,21 +389,24 @@ app.post('/api/v1/course/generate', (req, res) => {
     return res.status(400).json({ error: `Unsupported course: ${selectedCourse}. Supported courses are: git, rag, explainer.` });
   }
 
-  const voice = getCelebrityVoice(celebrity);
-  const jobId = `job_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
+  // Determine gender dynamically or via body override
+  let targetGender = gender;
+  if (!targetGender || (targetGender !== 'male' && targetGender !== 'female')) {
+    const normalizedCeleb = celebrity.toLowerCase();
+    const femaleCelebrities = ['deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika', 'nayanthara', 'female', 'aruna'];
+    const isFemale = femaleCelebrities.some(name => normalizedCeleb.includes(name));
+    targetGender = isFemale ? 'female' : 'male';
+  }
 
-  // Determine gender dynamically based on celebrity name
-  const normalizedCeleb = celebrity.toLowerCase();
-  const femaleCelebrities = ['deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika', 'nayanthara', 'female', 'aruna'];
-  const isFemale = femaleCelebrities.some(name => normalizedCeleb.includes(name));
-  const gender = isFemale ? 'female' : 'male';
+  const voice = getCelebrityVoice(celebrity, targetGender);
+  const jobId = `job_${uuidv4().replace(/-/g, '').slice(0, 8)}`;
   const courseKey = selectedCourse.toLowerCase();
 
   const job = {
     job_id: jobId,
     celebrity,
     course: courseKey,
-    gender,
+    gender: targetGender,
     speaker: voice.speaker,
     language_code: voice.language_code,
     status: 'queued',
@@ -359,14 +417,14 @@ app.post('/api/v1/course/generate', (req, res) => {
   };
 
   jobsDb.set(jobId, job);
-  console.log(`\x1b[35m[Job Queued]\x1b[0m Job ID: ${jobId} | Course: ${job.course} | Celebrity: ${celebrity} | Gender: ${gender}`);
+  console.log(`\x1b[35m[Job Queued]\x1b[0m Job ID: ${jobId} | Course: ${job.course} | Celebrity: ${celebrity} | Gender: ${targetGender}`);
 
   // Check if we have a pre-rendered cache video for this course & gender
-  const cachePath = path.join(__dirname, `../public/outputs/video_${courseKey}_${gender}.mp4`);
+  const cachePath = path.join(__dirname, `../public/outputs/video_${courseKey}_${targetGender}.mp4`);
   const finalOutputMp4 = path.join(__dirname, `../public/outputs/video_${jobId}.mp4`);
 
   if (fs.existsSync(cachePath)) {
-    console.log(`\x1b[32m[Cache Hit]\x1b[0m Job ID: ${jobId} | Copying pre-rendered video for ${courseKey} (${gender}) instantly.`);
+    console.log(`\x1b[32m[Cache Hit]\x1b[0m Job ID: ${jobId} | Copying pre-rendered video for ${courseKey} (${targetGender}) instantly.`);
     
     // Ensure outputs directory exists
     const OUTPUT_DIR = path.dirname(finalOutputMp4);
@@ -392,7 +450,7 @@ app.post('/api/v1/course/generate', (req, res) => {
       completed_at: job.completed_at,
       output_url: job.output_url,
       check_status_url: `/api/v1/course/jobs/${jobId}`,
-      message: `Pre-rendered video for '${job.course}' (${gender}) loaded instantly.`
+      message: `Pre-rendered video for '${job.course}' (${targetGender}) loaded instantly.`
     });
   }
 
