@@ -68,3 +68,10 @@ examples/sample-output/*.mp4
 examples/sample-output/*.wav
 examples/sample-output/*.png
 *.log
+
+# Video Rendering Temp files & outputs
+services/animation-service/output.mp4
+services/animation-service/public/assets/audio_*
+services/animation-service/public/assets/frames_*
+services/animation-service/public/outputs/*
+
