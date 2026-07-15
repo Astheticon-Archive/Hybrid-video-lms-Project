@@ -112,7 +112,7 @@ Environment variables can be set in a `.env` file in this directory or passed di
 | Environment Variable | Description | Default Value |
 | :--- | :--- | :--- |
 | `PORT` | Web server port | `3000` |
-| `SARVAM_API_KEY` | Subscription key for Sarvam AI Text-to-Speech | `sk_y25zfvvc_WhWlL0w3VjvolJikQyqJnHL0` |
+| `SARVAM_API_KEY` | Subscription key for Sarvam AI Text-to-Speech | `sk_xxxxxxxxxxxxxxxxxxxxxxxxxxx` |
 
 ---
 
