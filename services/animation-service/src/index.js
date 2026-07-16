@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // In-memory render job database
 const jobsDb = new Map();
 
-const API_KEY = process.env.SARVAM_API_KEY || "sk_y25zfvvc_WhWlL0w3VjvolJikQyqJnHL0";
+const API_KEY = process.env.SARVAM_API_KEY || "SARVAM_API_KEY_ENV_4";
 
 const celebrityVoiceMap = {
   // Male

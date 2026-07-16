@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const API_KEY = "sk_y25zfvvc_WhWlL0w3VjvolJikQyqJnHL0";
+const API_KEY = "SARVAM_API_KEY_ENV_4";
 const OUTPUT_DIR = path.join(__dirname, 'public/assets/audio');
 
 // Make sure output folder exists
