@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Git Command Animation Player | Hybrid Video LMS</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Fullscreen cinematic layout centering the video player, no sidebars -->
+  <div class="cinema-theater">
+    
+    <div class="video-container" id="video-container">
+      
+      <!-- The Video Canvas (16:9 pure black screen) -->
+      <div class="video-canvas" id="video-canvas">
+        
+        <!-- 1. Intro Screen (Covers the whole canvas) -->
+        <div class="canvas-panel full-panel active" id="panel-intro">
+          <div class="intro-content">
+            <h1 class="gradient-text animate-glow-text">COMPLETE GIT INTERNALS</h1>
+            <p>15-Minute Cinematic Masterclass & Timeline visualizer</p>
+            <div class="intro-ring-glow"></div>
+          </div>
+        </div>
+
+        <!-- 2. Dual-Panel Interactive View (Side-by-Side to prevent overlapping) -->
+        <div class="canvas-panel split-panel" id="panel-split">
+          
+          <!-- Left Panel: Command Line Terminal -->
+          <div class="terminal-column">
+            <div class="mac-terminal">
+              <div class="terminal-header">
+                <div class="terminal-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span class="terminal-title">git-bash.sh</span>
+              </div>
+              <div class="terminal-body" id="terminal-body">
+                <div class="terminal-line">
+                  <span class="prompt">$</span> <span id="terminal-input"></span>
+                </div>
+                <div class="terminal-output" id="terminal-output">
+                  <!-- shell logs -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Panel: Dynamic Visualizer (Swaps content based on active step) -->
+          <div class="visualizer-column">
+            
+            <!-- Dynamic Content Area A: File States (Staging/Working) -->
+            <div class="visual-subpanel" id="subpanel-files">
+              <div class="file-area working" id="working-area">
+                <div class="area-header"><i class="fa-solid fa-laptop-code"></i> Working Directory <span class="badge badge-danger">Untracked</span></div>
+                <div class="file-row" id="working-file-row"></div>
+              </div>
+              
+              <div class="staging-arrow">
+                <i class="fa-solid fa-angles-down animate-bounce-y"></i>
+                <span class="arrow-text">git add .</span>
+              </div>
+              
+              <div class="file-area staging" id="staging-area">
+                <div class="area-header"><i class="fa-solid fa-box-archive"></i> Staging Area <span class="badge badge-success">Staged</span></div>
+                <div class="file-row" id="staging-file-row"></div>
+              </div>
+            </div>
+
+            <!-- Dynamic Content Area B: Commit History Graph -->
+            <div class="visual-subpanel" id="subpanel-graph">
+              <div class="subpanel-title"><i class="fa-solid fa-database"></i> Local Repository Graph</div>
+              <div class="graph-box">
+                <svg id="canvas-commit-graph" class="graph-svg"></svg>
+              </div>
+              <div class="ref-pointers-bar" id="graph-pointers"></div>
+            </div>
+
+            <!-- Dynamic Content Area C: Local vs Remote Sync Graph -->
+            <div class="visual-subpanel" id="subpanel-remote">
+              <div class="remote-split-box">
+                <div class="remote-sub-area">
+                  <div class="subpanel-title"><i class="fa-solid fa-laptop"></i> Local Repository</div>
+                  <div class="mini-graph-box">
+                    <svg id="remote-local-graph" class="graph-svg"></svg>
+                  </div>
+                  <div class="ref-pointers-bar mini" id="remote-local-pointers"></div>
+                </div>
+                
+                <div class="remote-sync-arrow">
+                  <i class="fa-solid fa-arrows-left-right animate-pulse-x"></i>
+                </div>
+                
+                <div class="remote-sub-area">
+                  <div class="subpanel-title"><i class="fa-solid fa-cloud"></i> Remote (origin)</div>
+                  <div class="mini-graph-box">
+                    <svg id="remote-cloud-graph" class="graph-svg"></svg>
+                  </div>
+                  <div class="ref-pointers-bar mini" id="remote-cloud-pointers"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Content Area D: File Diff Panel -->
+            <div class="visual-subpanel" id="subpanel-diff">
+              <div class="subpanel-title"><i class="fa-solid fa-code-compare"></i> File Changes (git diff)</div>
+              <div class="diff-viewer">
+                <div class="diff-file-header">diff --git a/index.html b/index.html</div>
+                <div class="diff-body">
+                  <div class="diff-line normal">@@ -5,8 +5,10 @@</div>
+                  <div class="diff-line normal"> &lt;body&gt;</div>
+                  <div class="diff-line del">-  &lt;h1&gt;Hello World&lt;/h1&gt;</div>
+                  <div class="diff-line add">+  &lt;h1&gt;Welcome to Git Masterclass&lt;/h1&gt;</div>
+                  <div class="diff-line add">+  &lt;p&gt;This visual walkthrough explains Git internals.&lt;/p&gt;</div>
+                  <div class="diff-line normal">   &lt;script src="app.js"&gt;&lt;/script&gt;</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Content Area E: Stash Stack -->
+            <div class="visual-subpanel" id="subpanel-stash">
+              <div class="file-area working" id="stash-working-area">
+                <div class="area-header"><i class="fa-solid fa-laptop-code"></i> Working Directory</div>
+                <div class="file-row" id="stash-working-row"></div>
+              </div>
+              
+              <div class="stash-transition-zone">
+                <i class="fa-solid fa-right-left"></i>
+                <span class="arrow-text">git stash</span>
+              </div>
+              
+              <div class="file-area stash-chest" id="stash-stack-area">
+                <div class="area-header"><i class="fa-solid fa-vault"></i> Stash Stack <span class="badge badge-purple">stash@{0}</span></div>
+                <div class="file-row" id="stash-stack-row"></div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- 4. Subtitles Overlay (Bottom-Center) -->
+        <div class="video-subtitles" id="video-subtitles">
+          <p id="subtitles-p">Select Play to start the course...</p>
+        </div>
+
+      </div>
+
+      <!-- Video Controls Overlay -->
+      <div class="player-controls-overlay" id="player-controls">
+        
+        <!-- Video Seek Bar -->
+        <div class="progress-bar-container" id="seek-container">
+          <div class="progress-bar-bg"></div>
+          <div class="progress-bar-hover"></div>
+          <div class="progress-bar-fill" id="seek-fill"></div>
+          <div class="progress-bar-handle" id="seek-handle"></div>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="controls-toolbar">
+          <div class="controls-left">
+            <button class="player-btn" id="btn-play" title="Play (Space)"><i class="fa-solid fa-play"></i></button>
+            <button class="player-btn" id="btn-prev" title="Previous Step"><i class="fa-solid fa-backward-step"></i></button>
+            <button class="player-btn" id="btn-next" title="Next Step"><i class="fa-solid fa-forward-step"></i></button>
+            <div class="volume-control">
+              <button class="player-btn" id="btn-volume" title="Mute"><i class="fa-solid fa-volume-high"></i></button>
+              <div class="volume-slider-container">
+                <div class="volume-slider-fill" style="width: 80%"></div>
+              </div>
+            </div>
+            <span class="video-timer" id="video-timer">00:00 / 15:00</span>
+          </div>
+
+          <div class="controls-right">
+            <span class="chapter-indicator" id="chapter-indicator">INTRO</span>
+            <button class="player-btn" id="btn-loop" title="Toggle Loop"><i class="fa-solid fa-repeat"></i></button>
+            <button class="player-btn" id="btn-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get('jobId');
+    if (jobId) {
+      document.write('<script src="/api/job/' + jobId + '/config.js"><\/script>');
+    }
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
