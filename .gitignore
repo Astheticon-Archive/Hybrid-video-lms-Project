@@ -63,8 +63,10 @@ Thumbs.db
 .env.production.local
 docker-compose.override.yml
 
-# Temporary output and render cache files (but keep example directories)
-examples/sample-output/*.mp4
-examples/sample-output/*.wav
-examples/sample-output/*.png
+# Temporary output and render cache files
+render-output/
+generated_audio/
+*.mp4
+*.wav
+*.mp3
 *.log
