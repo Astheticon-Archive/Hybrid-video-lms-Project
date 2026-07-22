@@ -32,17 +32,27 @@ graph TD
 - **Native Revideo compiler** (used for `rag` course): Runs `npm run render` inside the RAG template directory, compiling the TypeScript scenes defined under `templates/rag/src/scenes` directly using the `@revideo/renderer` and `@revideo/core` libraries.
 
 ### 2. Audio Generation & Voice Mapping
-Voice narration is generated dynamically using the **Sarvam AI Text-to-Speech API** (`https://api.sarvam.ai/text-to-speech`) with the `bulbul:v3` model and `en-IN` target language. Celebrities passed in the request body are automatically mapped to specialized speakers:
-* **Shahrukh Khan (`shahrukh`, `srk`, etc.)** $\rightarrow$ Speaker: `aditya` (Male)
-* **NTR Jr (`ntr`, `jrntr`, etc.)** $\rightarrow$ Speaker: `shubh` (Male)
-* **Others / Defaults** $\rightarrow$ Speaker: `aditya`
+Voice narration is generated dynamically using the **Sarvam AI Text-to-Speech API** (`https://api.sarvam.ai/text-to-speech`) with automatic API key pool rotation (`sk_1ofvbhy...`, `sk_3rxpfwu...`, etc.) to handle rate-limits and credit exhaustion transparently. Celebrities passed in the request body are automatically mapped to specialized speakers:
+* **Shahrukh Khan (`shahrukh`, `srk`, etc.)** $\rightarrow$ Speaker: `aditya` (Male 1)
+* **NTR Jr (`ntr`, `jrntr`, etc.)** $\rightarrow$ Speaker: `shubh` (Male 2)
+* **Deepika Padukone (`deepika`, etc.)** $\rightarrow$ Speaker: `shreya` (Female 1)
+* **Alia Bhatt / Rashmika (`alia`, `rashmika`, etc.)** $\rightarrow$ Speaker: `aruna` (Female 2)
+* **Others / Defaults** $\rightarrow$ Speaker: `aditya` (Male) / `shreya` (Female)
 
-Gender is detected by checking if the celebrity name contains any matching substrings: `['deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika', 'nayanthara', 'female', 'aruna']`. If a match is found, the system registers the gender as `'female'`, otherwise it defaults to `'male'`.
+Gender detection is handled dynamically via **OpenRouter AI** (`openrouter/auto` model) with the `sk-or-v1-dea3b16...` key. If OpenRouter AI is unavailable or times out, the service gracefully falls back to local regex/keyword matching.
 
-### 3. Caching Strategy
+### 3. Supported Courses
+The service supports 4 complete interactive courses:
+1. **`git`**: Version Control Internals & Git Commands (`git-add`, `git-commit`, `git-branch`, `git-log`)
+2. **`rag`**: Retrieval-Augmented Generation Architecture (25 steps)
+3. **`explainer`**: System Architecture & Revideo Explainer (33 steps)
+4. **`dsa`** (`linkedlist`, `singly-linked-list`): Singly Linked List Data Structure Basics (9 Revideo 2D scenes)
+
+### 4. Caching Strategy & Fail-Safe Fallbacks
 To optimize response times and conserve API credits, the service checks for pre-rendered video templates named `video_${course}_${gender}.mp4` in the `public/outputs/` directory.
 - **Cache Hit**: If a matching template exists, the service copies it to the job-specific file immediately, registers the job status as `completed`, and returns the final video path instantly in the initial API response (`200 OK`).
 - **Cache Miss**: If the file is missing, the service responds with `202 Accepted` and kicks off the background rendering queue (generating TTS, probing audio, taking screenshots, and multiplexing tracks).
+- **Fail-Safe Recovery**: If live rendering fails or external keys expire, the service automatically falls back to serving the cached pre-rendered video so API consumers always receive a working video output URL.
 
 ---
 
