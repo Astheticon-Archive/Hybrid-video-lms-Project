@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node, Layout } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, pointerStyle, nodeStyle, canvas, codeBlock } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene009-alignment.json';
 import { CodeBlock, createCodeBlockRefs, moveHighlight } from '../components/CodeBlock.js';
 
 export default makeScene2D('Scene009', function* (view) {
@@ -10,6 +11,7 @@ export default makeScene2D('Scene009', function* (view) {
   // --- REFS ---
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
   const codeScrollNode = createRef<Node>();
   const codeRefs = createCodeBlockRefs();
@@ -26,14 +28,9 @@ export default makeScene2D('Scene009', function* (view) {
   const traverseTemp = createRef<Node>();
 
   // --- NARRATION ---
-  const beatAText = "Let's put it all together into a complete C++ class. Our constructor simply initializes the head to null. To insert at the head, we create a new node and point it to the current head, then update the head pointer. For inserting at the tail, if the list isn't empty, we traverse to the end before linking the new node. Inserting in the middle also requires traversing to the specific position.";
-  const beatBText = "When it comes to deletion, the logic depends on the position. Deleting the head is a simple pointer update and memory cleanup. For any other position, we traverse to find the node right before our target, update its next pointer to skip the deleted node, and free the memory. It's crucial to handle edge cases, like an empty list or the very last node.";
   const beatCTextStr = "Finally, traversing the list. We use a temporary pointer starting at the head, moving step by step using the next pointers until we reach null, printing each value along the way. And there you have it: a complete Singly Linked List, managing its own dynamic memory, node by node.";
 
-  const cuesA = generateCues(beatAText, 0, 43.1);
-  const cuesB = generateCues(beatBText, 43.1, 86.2 - 43.1);
-  const cuesC = generateCues(beatCTextStr, 86.2, 129.9 - 86.2);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- CONTENT & DATA ---
   const codeString = `class LinkedList {
@@ -216,9 +213,8 @@ public:
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -229,10 +225,28 @@ public:
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -264,14 +278,26 @@ public:
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---

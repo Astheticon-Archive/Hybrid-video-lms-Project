@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Txt, Node, Layout } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, nodeStyle, canvas } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene008-alignment.json';
 
 export default makeScene2D('Scene008', function* (view) {
   view.fill(colors.background);
@@ -23,16 +24,12 @@ export default makeScene2D('Scene008', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
   // --- NARRATION ---
-  const beatAText = "Let's summarize everything we've learned about singly linked lists by looking at the time complexity for each operation. We'll build out a cheat sheet table that you can refer back to.";
-  const beatBText = "Accessing or searching takes linear time since we must traverse. Inserting at the head is extremely fast, taking constant time. Inserting at the tail or middle requires traversal, taking linear time. Deleting the head is constant time, but deleting from the middle or tail also requires traversal, making it linear time.";
   const beatCTextStr = "This cheat sheet highlights the primary tradeoff of a singly linked list. They are fantastic when you frequently need to add or remove elements directly at the front, but they slow down significantly if you need to search for or modify elements near the end.";
 
-  const cuesA = generateCues(beatAText, 0, 25.7);
-  const cuesB = generateCues(beatBText, 25.7, 51.3 - 25.7);
-  const cuesC = generateCues(beatCTextStr, 51.3, 77.0 - 51.3);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- CONTENT & DATA ---
   const rowData = [
@@ -121,9 +118,8 @@ export default makeScene2D('Scene008', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -134,10 +130,28 @@ export default makeScene2D('Scene008', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -157,21 +171,33 @@ export default makeScene2D('Scene008', function* (view) {
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
     (function* () {
       
       // BEAT A (0 - 25.7s): Table build-in
-      const beatADuration = 25.7;
+      const beatADuration = 9.96;
       
       yield* titleText().opacity(1, animationDurations.fadeIn);
       yield* waitFor(1);
@@ -189,7 +215,7 @@ export default makeScene2D('Scene008', function* (view) {
       if (beatADuration - timeSpentA > 0) yield* waitFor(beatADuration - timeSpentA);
 
       // BEAT B (25.7 - 51.3s): Row highlight sweep
-      const beatBDuration = 51.3 - 25.7;
+      const beatBDuration = 31.56 - 9.96;
       
       // There are 7 rows. We spread out the pulses evenly over Beat B.
       // We'll leave 2 seconds at the beginning and end.
@@ -205,7 +231,7 @@ export default makeScene2D('Scene008', function* (view) {
       yield* waitFor(2);
 
       // BEAT C (51.3 - 77.0s): Full table hold
-      const beatCDuration = 77.0 - 51.3;
+      const beatCDuration = 47.12 - 31.56;
       yield* waitFor(beatCDuration);
     })()
   );

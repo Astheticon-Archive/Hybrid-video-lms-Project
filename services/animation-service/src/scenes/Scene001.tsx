@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node } from '@revideo/2d';
 import { all, sequence, waitFor, createRef } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, easing, nodeStyle, pointerStyle, canvas } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene001-alignment.json';
 
 export default makeScene2D('Scene001', function* (view) {
   view.fill(colors.background);
@@ -40,16 +41,9 @@ export default makeScene2D('Scene001', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
-  // --- CAPTIONS DATA ---
-  const beatAText = "Let's start with a question. Imagine you have a list of numbers stored in an array, and you need to insert a new number right at the beginning. What happens? Every single element in that array has to shift over by one spot to make room. If your array has a thousand elements, that's a thousand moves, just to add one value. The same problem happens when you delete from the front. Everything after it has to shift back to fill the gap. This shifting takes time, and as your data grows, that time grows too.";
-  const beatBText = "In the worst case, inserting or deleting at the front of an array costs O of n time, where n is the number of elements. That's because arrays store their elements in one continuous block of memory, back to back, like seats in a row. To insert in the middle of that row, you have to physically move people down. So, is there a way to add or remove elements without all that shifting? Yes. That's exactly what a linked list gives us. Instead of storing elements in one continuous block, a linked list stores each element separately, wherever there's free space in memory.";
-  const beatCText = "Each element knows where the next one lives, because it holds a reference, or a pointer, to it. Think of it like a treasure hunt. Each clue doesn't tell you the whole path. It just tells you where to find the next clue. As long as you know where to start, you can follow the chain all the way through. Because elements aren't glued together in memory, inserting a new one is often as simple as changing a couple of these references, no shifting required. In this lesson, we'll build this idea from the ground up, starting with a single building block called a node.";
-
-  const cuesA = generateCues(beatAText, 0, 35.0);
-  const cuesB = generateCues(beatBText, 35.0, 38.5);
-  const cuesC = generateCues(beatCText, 73.5, 38.9);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- INITIAL SETUP ---
   
@@ -290,9 +284,8 @@ export default makeScene2D('Scene001', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -303,10 +296,28 @@ export default makeScene2D('Scene001', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -320,20 +331,32 @@ export default makeScene2D('Scene001', function* (view) {
   yield* all(
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
     (function* () {
       // BEAT A: 0s - 35.0s (Array shifting)
-      const beatADuration = 35.0;
+      const beatADuration = 39.8;
       const delayBetweenShifts = 0.5;
       const totalShiftsTime = delayBetweenShifts * 5 + animationDurations.moveTo;
 
@@ -354,7 +377,7 @@ export default makeScene2D('Scene001', function* (view) {
       }
 
       // BEAT B: 35.0s - 73.5s (Linked List insertion)
-      const beatBDuration = 73.5 - 35.0;
+      const beatBDuration = 74.4 - 39.8;
 
       yield* newLLNode().opacity(1, animationDurations.fadeIn);
 
@@ -373,7 +396,7 @@ export default makeScene2D('Scene001', function* (view) {
       }
 
       // BEAT C: 73.5s - 112.4s (Text fade in)
-      const beatCDuration = 112.4 - 73.5;
+      const beatCDuration = 105.82 - 74.4;
 
       yield* all(
         textLine1().opacity(1, animationDurations.fadeIn),

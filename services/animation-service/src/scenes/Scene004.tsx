@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, pointerStyle, nodeStyle , canvas } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene004-alignment.json';
 import { CodeBlock, createCodeBlockRefs, moveHighlight } from '../components/CodeBlock.js';
 
 export default makeScene2D('Scene004', function* (view) {
@@ -39,18 +40,14 @@ export default makeScene2D('Scene004', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
   // --- CONTENT & DATA ---
   const codeString = `void insertAtHead(Node*& head, int value) {\n    Node* newNode = new Node();\n    newNode->data = value;\n    newNode->next = head;\n    head = newNode;\n}`;
 
-  const beatAText = "Let's insert our first new node. We'll start with the easiest case, inserting at the head of the list. Suppose we already have a list, and we want to add a brand new value right at the very front. Here's how we do it. First, we create a new node, and set its data to the value we want to insert. Next, and this is the important part, we set the new node's next pointer to point to whatever the current head is.";
-  const beatBText = "This connects our new node to the rest of the existing list. Finally, we update head itself, so that it now points to our new node. Just like that, our new node becomes the first node in the list, and everything that used to come after the old head is still connected, just one step further down the chain. Notice what we didn't have to do. We didn't have to touch any of the other nodes. We didn't shift anything, we didn't copy anything. We just changed two pointers, the new node's next, and the head. That means inserting at the head takes constant time, no matter how long the list is.";
   const beatCTextStr = "In big O notation, we call this O of 1. Compare that to an array, where inserting at the front means shifting every single element over. This is one of the biggest advantages linked lists have over arrays.";
 
-  const cuesA = generateCues(beatAText, 0, 32.1);
-  const cuesB = generateCues(beatBText, 32.1, 65.8 - 32.1);
-  const cuesC = generateCues(beatCTextStr, 65.8, 78.5 - 65.8);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- LAYOUT ---
   const leftX = -480;
@@ -184,9 +181,8 @@ export default makeScene2D('Scene004', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -197,10 +193,28 @@ export default makeScene2D('Scene004', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -213,20 +227,32 @@ export default makeScene2D('Scene004', function* (view) {
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
     (function* () {
       // BEAT A: 0s - 32.1s
-      const beatADuration = 32.1;
+      const beatADuration = 36.9;
       
       yield* all(
         nodeContainer().opacity(1, animationDurations.fadeIn),
@@ -248,7 +274,7 @@ export default makeScene2D('Scene004', function* (view) {
       if (paddingA > 0) yield* waitFor(paddingA);
 
       // BEAT B: 32.1s - 65.8s
-      const beatBDuration = 65.8 - 32.1;
+      const beatBDuration = 56.84 - 36.9;
       
       yield* moveHighlight(codeRefs, 3, animationDurations.highlight); // "newNode->next = head;"
       yield* waitFor(0.5);
@@ -281,7 +307,7 @@ export default makeScene2D('Scene004', function* (view) {
       if (paddingB > 0) yield* waitFor(paddingB);
 
       // BEAT C: 65.8s - 78.5s
-      const beatCDuration = 78.5 - 65.8;
+      const beatCDuration = 83.0 - 56.84;
       
       yield* moveHighlight(codeRefs, -1, animationDurations.highlight);
       

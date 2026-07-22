@@ -23,42 +23,11 @@ async function main() {
 
   for (const scene of scenes) {
     console.log(`\n=== Rendering ${scene} ===`);
-    const tempProjFile = path.join(process.cwd(), 'src', `temp-project-${scene}.ts`).replace(/\\/g, '/');
-    const code = `import { makeProject } from '@revideo/core';\nimport scene from './scenes/${scene}.js';\nexport default makeProject({ scenes: [scene] });`;
-    await fs.writeFile(tempProjFile, code);
-    
-    // Wait for file system and Vite to settle so HMR doesn't detach the frame
-    await new Promise(r => setTimeout(r, 2000));
-
-    const outPath = `render-output/raw/${scene}.mp4`;
-    
+    const outPath = path.join(process.cwd(), 'render-output', 'raw', `${scene}.mp4`);
     try {
-      await renderVideo({
-        projectFile: tempProjFile,
-        settings: {
-          outDir: 'render-output/raw',
-          outFile: `${scene}.mp4`,
-          logProgress: true,
-          puppeteer: {
-            // Using the known good chrome path from previous run
-            executablePath: 'C:/Users/Joel/.cache/puppeteer/chrome/win64-131.0.6778.204/chrome-win64/chrome.exe',
-            args: [
-              '--no-sandbox',
-              '--disable-setuid-sandbox',
-              '--disable-dev-shm-usage',
-              '--enable-features=WebCodecs',
-              '--use-gl=swiftshader',
-              '--enable-unsafe-webgpu',
-              '--disable-features=AudioServiceOutOfProcess'
-            ],
-          },
-        }
-      });
+      execSync(`node scripts/render-single.js ${scene}`, { stdio: 'inherit' });
     } catch (err) {
       console.error(`Failed to render ${scene}:`, err);
-    } finally {
-      // Clean up the temp file
-      await fs.unlink(tempProjFile).catch(() => {});
     }
 
     console.log(`\n=== Normalizing & Muxing Audio for ${scene} ===`);
@@ -71,7 +40,7 @@ async function main() {
       // Mux audio and apply standardization protocol
       // Source audio files are MP3-in-WAV containers, so we explicitly decode and re-encode
       // -ar 48000 forces resampling to 48kHz, -ac 2 forces stereo
-      execSync(`ffmpeg -y -i "${outPath}" -i "${audioPath}" -vf scale=1920:1080 -c:v libx264 -profile:v high -r 25 -pix_fmt yuv420p -c:a aac -ar 48000 -ac 2 -b:a 192k -shortest "${normPath}"`, { stdio: 'inherit' });
+      execSync(`ffmpeg -y -i "${outPath}" -i "${audioPath}" -map 0:v:0 -map 1:a:0 -vf scale=1920:1080 -c:v libx264 -profile:v high -r 25 -pix_fmt yuv420p -c:a aac -ar 48000 -ac 2 -b:a 192k -shortest "${normPath}"`, { stdio: 'inherit' });
     } catch (e) {
       console.warn(`\n⚠️ Audio file ${audioPath} not found! Rendering without audio.`);
       execSync(`ffmpeg -y -i "${outPath}" -vf scale=1920:1080 -c:v libx264 -profile:v high -r 25 -pix_fmt yuv420p -an "${normPath}"`, { stdio: 'inherit' });
