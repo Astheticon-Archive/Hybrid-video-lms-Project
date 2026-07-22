@@ -1,29 +1,14 @@
-import {makeProject} from '@revideo/core';
-
-import gitAdd from '../templates/git/git-add/scene';
-import gitBranch from '../templates/git/git-branch/scene';
-import gitCommit from '../templates/git/git-commit/scene';
-import gitInit from '../templates/git/git-init/scene';
-import gitIntro from '../templates/git/git-intro/scene';
-import gitLog from '../templates/git/git-log/scene';
-import gitMerge from '../templates/git/git-merge/scene';
-import gitPull from '../templates/git/git-pull/scene';
-import gitPush from '../templates/git/git-push/scene';
-import gitStatus from '../templates/git/git-status/scene';
-import gitSwitch from '../templates/git/git-switch/scene';
+import { makeProject } from '@revideo/core';
+import Scene001 from './scenes/Scene001.js';
+import Scene002 from './scenes/Scene002.js';
+import Scene003 from './scenes/Scene003.js';
+import Scene004 from './scenes/Scene004.js';
+import Scene005 from './scenes/Scene005.js';
+import Scene006 from './scenes/Scene006.js';
+import Scene007 from './scenes/Scene007.js';
+import Scene008 from './scenes/Scene008.js';
+import Scene009 from './scenes/Scene009.js';
 
 export default makeProject({
-  scenes: [
-    gitAdd,
-    gitBranch,
-    gitCommit,
-    gitInit,
-    gitIntro,
-    gitLog,
-    gitMerge,
-    gitPull,
-    gitPush,
-    gitStatus,
-    gitSwitch,
-  ],
+  scenes: [Scene001, Scene002, Scene003, Scene004, Scene005, Scene006, Scene007, Scene008, Scene009],
 });

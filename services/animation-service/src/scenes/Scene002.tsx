@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, pointerStyle, nodeStyle, canvas } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene002-alignment.json';
 import { CodeBlock, createCodeBlockRefs, moveHighlight, setBlockHighlight } from '../components/CodeBlock.js';
 
 export default makeScene2D('Scene002', function* (view) {
@@ -30,7 +31,6 @@ export default makeScene2D('Scene002', function* (view) {
   const node3 = createRef<Rect>();
   const arrow2to3 = createRef<Line>();
   
-  const beatCText = createRef<Txt>();
 
   // Right Side: CodeBlock
   const codeBlockContainer = createRef<Node>();
@@ -39,18 +39,15 @@ export default makeScene2D('Scene002', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
+  const beatCText = createRef<Txt>();
 
   // --- CONTENT & DATA ---
   const codeString = `struct Node {\n    int data;\n    Node* next;\n};`;
 
-  const beatAText = "So what actually is a node? A node is the basic building block of a linked list. Every node has two parts. The first part is the data. This is the actual value you want to store, like a number, a name, or anything else. The second part is called next. This is a pointer, which simply means it holds the memory address of another node. Think of it as an arrow pointing to whatever comes after it in the list. If there's nothing after it, the next pointer points to nothing at all, which in C++ we represent using a special value called nullptr.";
-  const beatBText = "In code, we define a node using a struct. Our struct has two members. One is an integer called data, and the other is a pointer to another Node, called next. That's it. That's the entire building block. A linked list, then, is simply a chain of these nodes, where each one points to the next, starting from a special node we call the head. The head is just a pointer that tells us where the list begins. If the head is nullptr, that means the list is empty.";
   const beatCTextStr = "Once we have a starting node, we can follow the next pointers, one after another, to reach every other node in the list. This simple structure, a value plus a pointer, is really all we need to build something powerful.";
 
-  const cuesA = generateCues(beatAText, 0, 41.3);
-  const cuesB = generateCues(beatBText, 41.3, 76.4 - 41.3);
-  const cuesC = generateCues(beatCTextStr, 76.4, 92.1 - 76.4);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- LAYOUT ---
   const leftX = -480;
@@ -216,9 +213,8 @@ export default makeScene2D('Scene002', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -229,10 +225,28 @@ export default makeScene2D('Scene002', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -245,20 +259,32 @@ export default makeScene2D('Scene002', function* (view) {
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
     (function* () {
       // BEAT A: 0s - 41.3s
-      const beatADuration = 41.3;
+      const beatADuration = 36.44;
       
       // Fade in data compartment, then next, then code block
       yield* dataBox().opacity(1, animationDurations.fadeIn);
@@ -281,7 +307,7 @@ export default makeScene2D('Scene002', function* (view) {
       if (paddingA > 0) yield* waitFor(paddingA);
 
       // BEAT B: 41.3s - 76.4s
-      const beatBDuration = 76.4 - 41.3;
+      const beatBDuration = 72.68 - 36.44;
       
       // Clear highlight line and set block highlight
       yield* all(
@@ -293,7 +319,7 @@ export default makeScene2D('Scene002', function* (view) {
       if (paddingB > 0) yield* waitFor(paddingB);
 
       // BEAT C: 76.4s - 92.1s
-      const beatCDuration = 92.1 - 76.4;
+      const beatCDuration = 83.28 - 72.68;
       
       // Clear block highlight
       yield* setBlockHighlight(codeRefs, false, animationDurations.highlight);

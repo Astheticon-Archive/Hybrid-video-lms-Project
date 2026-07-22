@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, pointerStyle, nodeStyle , canvas } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene005-alignment.json';
 import { CodeBlock, createCodeBlockRefs, moveHighlight } from '../components/CodeBlock.js';
 
 export default makeScene2D('Scene005', function* (view) {
@@ -48,18 +49,14 @@ export default makeScene2D('Scene005', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
   // --- CONTENT & DATA ---
   const codeString = `void insertAtTail(Node*& head, int value) {\n    Node* newNode = new Node();\n    newNode->data = value;\n    newNode->next = nullptr;\n\n    if (head == nullptr) {\n        head = newNode;\n        return;\n    }\n\n    Node* temp = head;\n    while (temp->next != nullptr) {\n        temp = temp->next;\n    }\n    temp->next = newNode;\n}`;
 
-  const beatAText = "Now let's insert at the opposite end, the tail of the list. This one is a little trickier, because our list only keeps track of the head. There's no separate pointer that already knows where the last node is. That means, to insert at the tail, we first have to find it ourselves, by traversing the entire list. Here's the plan. We create our new node just like before, but this time, its next pointer should point to nullptr, since it will become the very last node. Next, we check a special case.";
-  const beatBText = "If the list is currently empty, meaning head is nullptr, then our new node simply becomes the head, and we're done. But if the list already has nodes in it, we need to walk all the way to the end. We start a temp pointer at head, and we keep moving forward, node by node, as long as temp's next pointer is not nullptr. When that loop ends, temp is sitting on the very last node in the list. Now we simply set temp's next pointer to our new node, linking it onto the end of the chain.";
   const beatCTextStr = "Notice the difference from inserting at the head. Because we have to walk through every node to find the end, this operation takes O of n time, where n is the number of nodes in the list. If we had kept a separate tail pointer, we could do this in constant time instead, but for now, we'll keep things simple and always find the tail by walking there ourselves.";
 
-  const cuesA = generateCues(beatAText, 0, 31.1);
-  const cuesB = generateCues(beatBText, 31.1, 63.9 - 31.1);
-  const cuesC = generateCues(beatCTextStr, 63.9, 87.4 - 63.9);
-  const allCues = [...cuesA, ...cuesB, ...cuesC];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- LAYOUT ---
   const leftX = -480;
@@ -220,9 +217,8 @@ export default makeScene2D('Scene005', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -233,10 +229,28 @@ export default makeScene2D('Scene005', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -249,20 +263,32 @@ export default makeScene2D('Scene005', function* (view) {
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
     (function* () {
       // BEAT A: 0s - 38.5s
-      const beatADuration = 31.1;
+      const beatADuration = 29.84;
       
       yield* all(
         nodeContainer().opacity(1, animationDurations.fadeIn),
@@ -285,7 +311,7 @@ export default makeScene2D('Scene005', function* (view) {
       if (paddingA > 0) yield* waitFor(paddingA);
 
       // BEAT B: 31.1s - 63.9s
-      const beatBDuration = 63.9 - 31.1;
+      const beatBDuration = 66.28 - 29.84;
       
       // Highlight "if (head == nullptr)" skip
       yield* moveHighlight(codeRefs, 5, animationDurations.highlight);
@@ -353,7 +379,7 @@ export default makeScene2D('Scene005', function* (view) {
       if (paddingB > 0) yield* waitFor(paddingB);
 
       // BEAT C: 63.9s - 87.4s
-      const beatCDuration = 87.4 - 63.9;
+      const beatCDuration = 88.74 - 66.28;
       
       // Highlight while loop and final line in sync with O(n) explanation
       yield* moveHighlight(codeRefs, 11, animationDurations.highlight);
