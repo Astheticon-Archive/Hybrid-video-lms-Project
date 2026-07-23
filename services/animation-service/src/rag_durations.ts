@@ -1,29 +1,3 @@
-// Automatically generated.
-// Do not manually edit this file.
+// Automatically generated full educational durations.
 
-export const ragDurations = [
-  7.64,
-  8,
-  8.27,
-  8.24,
-  7.69,
-  9.95,
-  8.51,
-  8.34,
-  8.51,
-  10.26,
-  7.33,
-  9.08,
-  8.03,
-  9.18,
-  10.79,
-  8.32,
-  8.51,
-  8.22,
-  7.12,
-  8.92,
-  9.2,
-  10.31,
-  9.18,
-  6.71
-] as const;
+export const ragDurations = [38.1, 36.54, 38.94, 35.41, 33.52, 32.41, 34.24, 34.04, 34.72, 33.18, 31.09, 35.34, 37.04, 37.28, 37.45, 36.25, 33.44, 33.18, 34.43, 36.11, 39.28, 40.31, 36.23, 39.3] as const;
