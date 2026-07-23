@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Line, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -10,6 +10,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn } from '../animations/fade';
 import { drawIn } from '../animations/draw';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene4', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -26,10 +27,14 @@ export default makeScene2D('scene4', function* (view) {
 
   view.add(
     <Background>
-      <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
+      <Rect
+        ref={cameraRef}
+        size={['100%', '100%']}
+        justifyContent={'center'}
+        alignItems={'center'}
+      >
 
-        {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={1}>
+        <Rect ref={titleRef} y={-400} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -39,16 +44,23 @@ export default makeScene2D('scene4', function* (view) {
           />
         </Rect>
 
-        {/* User Card */}
         <Card
           ref={userCardRef}
           x={-500}
           y={0}
           width={280}
           height={180}
-          opacity={1}
+          opacity={0}
         >
-          <Badge text={'USER'} color={THEME.colors.primary} marginBottom={10} />
+          <Badge
+            text={'USER'}
+            color={THEME.colors.primary}
+            marginBottom={10}
+          />
+          <Audio
+            src="/audio/female/step_3.wav"
+            play
+          />
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={22}
@@ -59,24 +71,26 @@ export default makeScene2D('scene4', function* (view) {
           />
         </Card>
 
-        {/* Arrow 1: User -> LLM */}
         <AnimatedArrow
           ref={arrow1Ref}
           points={[[-330, 0], [-180, 0]]}
           glowColor={THEME.colors.primary}
         />
 
-        {/* LLM Card */}
         <Card
           ref={llmCardRef}
           x={0}
           y={0}
           width={280}
           height={180}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.purple}
         >
-          <Badge text={'LLM'} color={THEME.colors.purple} marginBottom={10} />
+          <Badge
+            text={'LLM'}
+            color={THEME.colors.purple}
+            marginBottom={10}
+          />
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={20}
@@ -87,24 +101,26 @@ export default makeScene2D('scene4', function* (view) {
           />
         </Card>
 
-        {/* Arrow 2: LLM -> Answer */}
         <AnimatedArrow
           ref={arrow2Ref}
           points={[[180, 0], [330, 0]]}
           glowColor={THEME.colors.purple}
         />
 
-        {/* Answer Card */}
         <Card
           ref={answerCardRef}
           x={500}
           y={0}
           width={280}
           height={180}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.success}
         >
-          <Badge text={'ANSWER'} color={THEME.colors.success} marginBottom={10} />
+          <Badge
+            text={'ANSWER'}
+            color={THEME.colors.success}
+            marginBottom={10}
+          />
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={22}
@@ -115,12 +131,11 @@ export default makeScene2D('scene4', function* (view) {
           />
         </Card>
 
-        {/* Caption */}
         <Caption
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -129,14 +144,49 @@ export default makeScene2D('scene4', function* (view) {
 
   const captionTxt = captionRef().children()[0] as Txt;
 
-  yield* all(
-    // Camera pan/zoom
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.y(-10, 8),
+  // Total animation time before the final wait
+  const elapsedTime = 25.8;
 
-    // Scene animation sequence
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[3] - elapsedTime
+  );
+
+  yield* all(
+    // Camera lasts for the entire narration
+    cameraRef().scale(1.04, ragDurationsFemale[3]),
+    cameraRef().position.y(-10, ragDurationsFemale[3]),
+
     chain(
-      typeText(captionTxt, 'In traditional systems, questions go directly to the model, which only knows what it learned in training.', 7.94)
+      waitFor(1),
+
+      fadeIn(titleRef(), 2),
+      waitFor(2),
+
+      popIn(userCardRef(), 2),
+      waitFor(2),
+
+      drawIn(arrow1Ref(), 2),
+      waitFor(2),
+
+      popIn(llmCardRef(), 2),
+      waitFor(2),
+
+      drawIn(arrow2Ref(), 2),
+      waitFor(2),
+
+      popIn(answerCardRef(), 2),
+      waitFor(2),
+
+      fadeIn(captionRef(), 2),
+
+      typeText(
+        captionTxt,
+        'In traditional systems, questions go directly to the model, which only knows what it learned in training.',
+        2.8
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -10,7 +10,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn } from '../animations/fade';
 import { slideInFrom } from '../animations/slide';
 import { typeText } from '../animations/typing';
-
+import { ragDurationsFemale } from '../rag_durations_female';
 export default makeScene2D('scene24', function* (view) {
   const cameraRef = createRef<Rect>();
   const titleRef = createRef<Rect>();
@@ -26,7 +26,7 @@ export default makeScene2D('scene24', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={1}>
+        <Rect ref={titleRef} y={-390} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -43,7 +43,7 @@ export default makeScene2D('scene24', function* (view) {
           y={-10}
           width={320}
           height={280}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.purple}
           showGlow={true}
         >
@@ -56,9 +56,13 @@ export default makeScene2D('scene24', function* (view) {
             textWrap={true}
           />
         </Card>
+        <Audio
+          src="/audio/female/step_17.wav"
+          play
+        />
 
         {/* PromptBox in the center */}
-        <Rect ref={promptBoxRef} x={60} y={-10} opacity={1}>
+        <Rect ref={promptBoxRef} x={60} y={-10} opacity={0}>
           <PromptBox
             questionText={'How does RAG reduce hallucination?'}
             contextText={'RAG grounds the model by injecting retrieved facts directly into the prompt...'}
@@ -73,7 +77,7 @@ export default makeScene2D('scene24', function* (view) {
           y={-10}
           width={300}
           height={280}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.success}
         >
           <Badge text={'BEST PRACTICES'} color={THEME.colors.success} marginBottom={14} />
@@ -91,7 +95,7 @@ export default makeScene2D('scene24', function* (view) {
           ref={captionRef}
           text={''}
           y={360}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -99,13 +103,43 @@ export default makeScene2D('scene24', function* (view) {
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
+  const elapsedTime = 31.7;
+
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[17] - elapsedTime
+  );
 
   yield* all(
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.y(-5, 8),
+    cameraRef().scale(1.04, ragDurationsFemale[17]),
+    cameraRef().position.y(-5, ragDurationsFemale[17]),
 
     chain(
-      typeText(captionTxt, 'A well-crafted system prompt tells the model to ground answers in retrieved context and admit uncertainty.', 7.92)
+      waitFor(1),
+
+      fadeIn(titleRef(), 0.6),
+      waitFor(2),
+
+      // Slide in system card from left
+      slideInFrom(systemCardRef(), -60, 0, 0.6),
+      waitFor(8),
+
+      // Pop in prompt box center
+      popIn(promptBoxRef(), 0.7),
+      waitFor(8),
+
+      // Slide in tips card from right
+      slideInFrom(tipsCardRef(), 60, 0, 0.6),
+      waitFor(8),
+
+      fadeIn(captionRef(), 0.5),
+      typeText(
+        captionTxt,
+        'A well-crafted system prompt tells the model to ground answers in retrieved context and admit uncertainty.',
+        2.6
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

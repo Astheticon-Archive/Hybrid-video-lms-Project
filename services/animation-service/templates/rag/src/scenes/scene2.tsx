@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Line, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -11,6 +11,7 @@ import { fadeIn } from '../animations/fade';
 import { drawIn } from '../animations/draw';
 import { shakeNode } from '../animations/shake';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene2', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -30,10 +31,18 @@ export default makeScene2D('scene2', function* (view) {
 
   view.add(
     <Background>
-      <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
-
+      <Rect
+        ref={cameraRef}
+        size={['100%', '100%']}
+        justifyContent={'center'}
+        alignItems={'center'}
+      >
+        <Audio
+          src="/audio/female/step_1.wav"
+          play
+        />
         {/* Title */}
-        <Rect ref={titleRef} y={-350} opacity={1}>
+        <Rect ref={titleRef} y={-350} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -43,44 +52,54 @@ export default makeScene2D('scene2', function* (view) {
           />
         </Rect>
 
-        {/* User Query Card */}
+        {/* User Query */}
         <Card
           ref={userCardRef}
           x={-450}
           y={-100}
           width={350}
           height={180}
-          opacity={1}
+          opacity={0}
         >
-          <Badge text={'USER QUERY'} color={THEME.colors.primary} marginBottom={10} />
+          <Badge
+            text={'USER QUERY'}
+            color={THEME.colors.primary}
+            marginBottom={10}
+          />
+
           <Txt
             ref={queryTextRef}
             fontFamily={THEME.fonts.main}
             fontSize={20}
             fill={THEME.colors.text}
             text={''}
-            textWrap={true}
+            textWrap
           />
         </Card>
 
-        {/* Arrow 1: Query -> LLM */}
+        {/* Arrow */}
         <AnimatedArrow
           ref={arrow1Ref}
           points={[[-275, -100], [-150, -100]]}
           glowColor={THEME.colors.primary}
         />
 
-        {/* LLM Card */}
+        {/* LLM */}
         <Card
           ref={llmCardRef}
           x={0}
           y={-100}
           width={300}
           height={180}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.purple}
         >
-          <Badge text={'BASE LLM'} color={THEME.colors.purple} marginBottom={10} />
+          <Badge
+            text={'BASE LLM'}
+            color={THEME.colors.purple}
+            marginBottom={10}
+          />
+
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={18}
@@ -90,56 +109,113 @@ export default makeScene2D('scene2', function* (view) {
           />
         </Card>
 
-        {/* Arrow 2: LLM -> Answer */}
+        {/* Arrow */}
         <AnimatedArrow
           ref={arrow2Ref}
           points={[[150, -100], [275, -100]]}
           glowColor={THEME.colors.purple}
         />
 
-        {/* Answer Card */}
+        {/* Hallucinated Answer */}
         <Card
           ref={answerCardRef}
           x={450}
           y={-100}
           width={350}
           height={180}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.error}
         >
-          <Badge text={'HALLUCINATED ANSWER'} color={THEME.colors.error} marginBottom={10} />
+          <Badge
+            text={'HALLUCINATED ANSWER'}
+            color={THEME.colors.error}
+            marginBottom={10}
+          />
+
           <Txt
             ref={answerTextRef}
             fontFamily={THEME.fonts.main}
             fontSize={20}
             fill={THEME.colors.error}
             text={''}
-            textWrap={true}
+            textWrap
           />
         </Card>
 
-        {/* Subtitles / Caption */}
+        {/* Caption */}
         <Caption
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
-
       </Rect>
     </Background>
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
 
-  yield* all(
-    // Slow camera drift
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.x(-10, 8),
+  // Time already consumed before the final wait
+  const elapsedTime = 27.5;
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[1] - elapsedTime
+  );
 
-    // Scene animation sequence
+  yield* all(
+    // Camera movement lasts exactly as long as the narration
+    cameraRef().scale(1.04, ragDurationsFemale[1]),
+    cameraRef().position.x(-10, ragDurationsFemale[1]),
+
     chain(
-      typeText(captionTxt, 'When LLMs rely only on training data, they confidently hallucinate facts they do not know.', 16.54)
+      waitFor(1),
+
+      fadeIn(titleRef(), 2),
+      waitFor(2),
+
+      all(
+        popIn(userCardRef(), 2),
+        typeText(
+          queryTextRef(),
+          'Who won the soccer world tournament in 2026?',
+          2
+        )
+      ),
+
+      waitFor(2),
+
+      chain(
+        drawIn(arrow1Ref(), 2),
+        popIn(llmCardRef(), 2)
+      ),
+
+      waitFor(2),
+
+      chain(
+        drawIn(arrow2Ref(), 2),
+        all(
+          popIn(answerCardRef(), 2),
+          typeText(
+            answerTextRef(),
+            'FC Solar won the world tournament (Incorrect Fact!)',
+            2
+          )
+        )
+      ),
+
+      waitFor(2),
+
+      shakeNode(answerCardRef(), 20, 2),
+
+      fadeIn(captionRef(), 2),
+
+      typeText(
+        captionTxt,
+        'When LLMs rely only on training data, they confidently hallucinate facts they do not know.',
+        2.5
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

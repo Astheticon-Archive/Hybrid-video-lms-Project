@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Line, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -9,6 +9,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn, fadeOut } from '../animations/fade';
 import { drawIn } from '../animations/draw';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene12', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -48,7 +49,7 @@ export default makeScene2D('scene12', function* (view) {
           y={0}
           width={600}
           height={300}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.primary}
           showGlow={true}
           alignItems={'center'}
@@ -69,13 +70,17 @@ export default makeScene2D('scene12', function* (view) {
             text={'You are now ready to build with RAG!'}
           />
         </Card>
+        <Audio
+          src="/audio/female/step_23.wav"
+          play
+        />
 
         {/* Caption */}
         <Caption
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -83,15 +88,34 @@ export default makeScene2D('scene12', function* (view) {
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
+  const elapsedTime = 20.3;
+
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[23] - elapsedTime
+  );
 
   yield* all(
     // Slow camera drift
-    cameraRef().scale(1.05, 8),
-    cameraRef().position.y(20, 8),
+    cameraRef().scale(1.05, ragDurationsFemale[23]),
+    cameraRef().position.y(20, ragDurationsFemale[23]),
 
     // Scene animation sequence
     chain(
-      waitFor(2.45)
+      waitFor(0.5),
+
+
+
+      // Animate List items in sequence
+
+
+      // Fade out advantages list & title, and fade in bottom caption
+
+
+      // Pop in Thank You Card
+      popIn(thankYouRef(), 0.8),
+
+      waitFor(remainingTime)
     )
   );
 });

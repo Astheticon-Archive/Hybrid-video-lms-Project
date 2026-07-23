@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -10,6 +10,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn } from '../animations/fade';
 import { slideInFrom } from '../animations/slide';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene21', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -31,7 +32,7 @@ export default makeScene2D('scene21', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={1}>
+        <Rect ref={titleRef} y={-390} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -40,6 +41,10 @@ export default makeScene2D('scene21', function* (view) {
             text={'Dense vs Sparse Retrieval'}
           />
         </Rect>
+        <Audio
+          src="/audio/female/step_14.wav"
+          play
+        />
 
         {/* Dense column */}
         <Rect
@@ -50,7 +55,7 @@ export default makeScene2D('scene21', function* (view) {
           x={-330}
           y={10}
           alignItems={'center'}
-          opacity={1}
+          opacity={0}
         >
           <Badge text={'DENSE RETRIEVAL'} color={THEME.colors.cyan} />
           <Vector values={[0.82, -0.41, 0.09, 0.95]} glow={true} />
@@ -65,7 +70,7 @@ export default makeScene2D('scene21', function* (view) {
         </Rect>
 
         {/* Vertical divider */}
-        <Rect ref={dividerRef} x={0} y={30} width={2} height={350} fill={'rgba(148,163,184,0.2)'} opacity={1} />
+        <Rect ref={dividerRef} x={0} y={30} width={2} height={350} fill={'rgba(148,163,184,0.2)'} opacity={0} />
 
         {/* Sparse column */}
         <Rect
@@ -76,7 +81,7 @@ export default makeScene2D('scene21', function* (view) {
           x={330}
           y={10}
           alignItems={'center'}
-          opacity={1}
+          opacity={0}
         >
           <Badge text={'SPARSE RETRIEVAL'} color={THEME.colors.warning} />
           <Card width={320} height={60} alignItems={'center'} justifyContent={'center'}>
@@ -97,7 +102,7 @@ export default makeScene2D('scene21', function* (view) {
           ref={captionRef}
           text={''}
           y={400}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -105,13 +110,37 @@ export default makeScene2D('scene21', function* (view) {
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
+  const elapsedTime = 5.9;
 
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[14] - elapsedTime
+  );
   yield* all(
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.x(5, 8),
-
+    cameraRef().scale(1.04, ragDurationsFemale[14]),
+    cameraRef().position.x(5, ragDurationsFemale[14]),
     chain(
-      typeText(captionTxt, 'Dense retrieval captures meaning but is compute-heavy. Sparse retrieval is fast but keyword-bound. Use both together.', 10.49)
+      waitFor(0.4),
+
+      fadeIn(titleRef(), 0.6),
+      waitFor(0.3),
+
+      fadeIn(dividerRef(), 0.4),
+
+      all(
+        slideInFrom(denseColRef(), -60, 0, 0.7),
+        chain(waitFor(0.2), slideInFrom(sparseColRef(), 60, 0, 0.7))
+      ),
+      waitFor(0.5),
+
+      fadeIn(captionRef(), 0.5),
+      typeText(
+        captionTxt,
+        'Dense retrieval captures meaning but is compute-heavy. Sparse retrieval is fast but keyword-bound. Use both together.',
+        2.8
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Line, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -9,6 +9,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn } from '../animations/fade';
 import { drawIn } from '../animations/draw';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene13', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -28,7 +29,7 @@ export default makeScene2D('scene13', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={1}>
+        <Rect ref={titleRef} y={-390} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -45,7 +46,7 @@ export default makeScene2D('scene13', function* (view) {
           y={0}
           width={340}
           height={300}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.error}
         >
           <Badge text={'TRADITIONAL DB'} color={THEME.colors.error} marginBottom={16} />
@@ -56,6 +57,10 @@ export default makeScene2D('scene13', function* (view) {
             fill={THEME.colors.text}
             text={'Exact Keyword Match'}
             marginBottom={10}
+          />
+          <Audio
+            src="/audio/female/step_9.wav"
+            play
           />
           <Txt
             fontFamily={THEME.fonts.main}
@@ -83,7 +88,7 @@ export default makeScene2D('scene13', function* (view) {
         </Card>
 
         {/* VS separator */}
-        <Rect ref={vsTextRef} x={0} y={0} opacity={1}>
+        <Rect ref={vsTextRef} x={0} y={0} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={52}
@@ -100,7 +105,7 @@ export default makeScene2D('scene13', function* (view) {
           y={0}
           width={340}
           height={300}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.cyan}
           showGlow={true}
         >
@@ -143,7 +148,7 @@ export default makeScene2D('scene13', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -151,15 +156,50 @@ export default makeScene2D('scene13', function* (view) {
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
+  const elapsedTime = 27.6;
+
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[9] - elapsedTime
+  );
 
   yield* all(
     // Slow camera drift
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.y(-10, 8),
-
+    cameraRef().scale(1.04, ragDurationsFemale[9]),
+    cameraRef().position.y(-10, ragDurationsFemale[9]),
     // Scene animation sequence
     chain(
-      typeText(captionTxt, 'Traditional databases match exact keywords. Vector databases find semantically similar content — even with different words.', 9.96)
+      waitFor(2),
+
+      // Fade in Title
+      fadeIn(titleRef(), 0.6),
+      waitFor(2),
+
+      // Pop in Traditional DB card
+      popIn(traditionalCardRef(), 0.7),
+      waitFor(2),
+      drawIn(arrow1Ref(), 0.4),
+      waitFor(2),
+
+      // Fade in VS
+      fadeIn(vsTextRef(), 0.5),
+      waitFor(2),
+
+      // Pop in Vector DB card
+      popIn(vectorCardRef(), 0.7),
+      waitFor(2),
+      drawIn(arrow2Ref(), 0.4),
+      waitFor(5),
+
+      // Caption
+      fadeIn(captionRef(), 2),
+      typeText(
+        captionTxt,
+        'Traditional databases match exact keywords. Vector databases find semantically similar content — even with different words.',
+        3.0
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

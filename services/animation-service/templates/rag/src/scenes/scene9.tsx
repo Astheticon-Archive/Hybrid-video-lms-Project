@@ -38,7 +38,7 @@ export default makeScene2D('scene9', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={1}>
+        <Rect ref={titleRef} y={-400} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -53,7 +53,7 @@ export default makeScene2D('scene9', function* (view) {
           ref={searchBarRef}
           x={-500}
           y={-150}
-          opacity={1}
+          opacity={0}
           searchText={'What is RAG?'}
         />
 
@@ -69,7 +69,7 @@ export default makeScene2D('scene9', function* (view) {
           ref={queryVecRef}
           x={-500}
           y={50}
-          opacity={1}
+          opacity={0}
           values={[0.77, -0.12, 0.54]}
           glow={true}
         />
@@ -82,7 +82,7 @@ export default makeScene2D('scene9', function* (view) {
         />
 
         {/* DB Cylinder stack */}
-        <Rect ref={dbContainerRef} x={0} y={50} opacity={1}>
+        <Rect ref={dbContainerRef} x={0} y={50} opacity={0}>
           <Database ref={dbRef} />
         </Rect>
 
@@ -94,7 +94,7 @@ export default makeScene2D('scene9', function* (view) {
         />
 
         {/* Retrieved Document */}
-        <Rect ref={docContainerRef} x={450} y={50} opacity={1}>
+        <Rect ref={docContainerRef} x={450} y={50} opacity={0}>
           <Document ref={docRef} highlightedLine={2} highlightColor={THEME.colors.cyan} />
         </Rect>
 
@@ -103,7 +103,7 @@ export default makeScene2D('scene9', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -119,7 +119,55 @@ export default makeScene2D('scene9', function* (view) {
 
     // Scene animation sequence
     chain(
-      typeText(captionTxt, 'The query is vectorized, compared to indexed vectors, and the top-matching documents are retrieved.', 7.44)
+      waitFor(1),
+
+      // Fade in Title
+      fadeIn(titleRef(), 0.6),
+
+      // Pop in Search bar
+      popIn(searchBarRef(), 0.6),
+      waitFor(2),
+
+      // Draw search to vector arrow
+      drawIn(arrowSearchToVecRef(), 0.5),
+      waitFor(0.1),
+
+      // Pop in Query vector
+      popIn(queryVecRef(), 0.6),
+      waitFor(1),
+
+      // Pop in database, draw vector to DB arrow
+      all(
+        popIn(dbContainerRef(), 0.6),
+        drawIn(arrowVecToDbRef(), 0.6)
+      ),
+      waitFor(1),
+
+      // Slide Query vector into DB canister
+      all(
+        slideOutTo(queryVecRef(), 500, 0, 0.6),
+        chain(
+          waitFor(1),
+          all(
+            dbRef().shadowColor(THEME.colors.primary, 0.3),
+            dbRef().shadowBlur(20, 0.3)
+          )
+        )
+      ),
+      waitFor(1),
+
+      // Draw DB to Document arrow, and pop document
+      all(
+        drawIn(arrowDbToDocRef(), 0.6),
+        popIn(docContainerRef(), 0.6)
+      ),
+      waitFor(1),
+
+      // Caption
+      fadeIn(captionRef(), 0.5),
+      typeText(captionTxt, 'The query is vectorized, compared to indexed vectors, and the top-matching documents are retrieved.', 2.8),
+
+      waitFor(3)
     )
   );
 });

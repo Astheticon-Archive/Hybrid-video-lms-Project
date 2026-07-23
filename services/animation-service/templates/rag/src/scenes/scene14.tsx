@@ -1,4 +1,4 @@
-import { makeScene2D, Rect, Txt, Line } from '@revideo/2d';
+import { makeScene2D, Rect, Txt, Line, Audio } from '@revideo/2d';
 import { all, chain, createRef, waitFor } from '@revideo/core';
 import { THEME } from '../utils/theme';
 import { Background } from '../components/Background';
@@ -11,6 +11,7 @@ import { popIn } from '../animations/pop';
 import { fadeIn } from '../animations/fade';
 import { drawIn } from '../animations/draw';
 import { typeText } from '../animations/typing';
+import { ragDurationsFemale } from '../rag_durations_female';
 
 export default makeScene2D('scene14', function* (view) {
   const cameraRef = createRef<Rect>();
@@ -29,7 +30,7 @@ export default makeScene2D('scene14', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={1}>
+        <Rect ref={titleRef} y={-390} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -38,6 +39,10 @@ export default makeScene2D('scene14', function* (view) {
             text={'What is an Embedding?'}
           />
         </Rect>
+        <Audio
+          src="/audio/female/step_6.wav"
+          play
+        />
 
         {/* Input Text Card */}
         <Card
@@ -46,7 +51,7 @@ export default makeScene2D('scene14', function* (view) {
           y={-20}
           width={260}
           height={160}
-          opacity={1}
+          opacity={0}
         >
           <Badge text={'RAW TEXT'} color={THEME.colors.primary} marginBottom={12} />
           <Txt
@@ -72,7 +77,7 @@ export default makeScene2D('scene14', function* (view) {
           y={-20}
           width={280}
           height={160}
-          opacity={1}
+          opacity={0}
           glowColor={THEME.colors.primary}
           showGlow={true}
         >
@@ -106,13 +111,13 @@ export default makeScene2D('scene14', function* (view) {
           ref={vectorRef}
           x={450}
           y={-20}
-          opacity={1}
+          opacity={0}
           values={[0.82, -0.41, 0.09, 0.95, -0.73, 0.36]}
           glow={true}
         />
 
         {/* Dimensionality label */}
-        <Rect ref={dimLabelRef} x={450} y={70} opacity={1}>
+        <Rect ref={dimLabelRef} x={450} y={70} opacity={0}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={16}
@@ -126,7 +131,7 @@ export default makeScene2D('scene14', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={1}
+          opacity={0}
         />
 
       </Rect>
@@ -134,14 +139,49 @@ export default makeScene2D('scene14', function* (view) {
   );
 
   const captionTxt = captionRef().children()[0] as Txt;
+  const elapsedTime = 22.0;
 
+  const remainingTime = Math.max(
+    0,
+    ragDurationsFemale[6] - elapsedTime
+  );
   yield* all(
     // Slow camera drift
-    cameraRef().scale(1.04, 8),
-    cameraRef().position.x(10, 8),
+    cameraRef().scale(1.04, ragDurationsFemale[6]),
+    cameraRef().position.x(10, ragDurationsFemale[6]),
 
     chain(
-      typeText(captionTxt, 'An embedding is a dense numerical vector that captures the semantic meaning of text in high-dimensional space.', 8.21)
+      waitFor(2),
+
+      fadeIn(titleRef(), 0.6),
+      waitFor(2),
+
+      popIn(textCardRef(), 0.6),
+      waitFor(2),
+
+      drawIn(arrow1Ref(), 0.5),
+      waitFor(1),
+
+      popIn(encoderCardRef(), 0.6),
+      waitFor(2),
+
+      drawIn(arrow2Ref(), 0.5),
+      waitFor(1),
+
+      popIn(vectorRef(), 0.7),
+      waitFor(2),
+
+      fadeIn(dimLabelRef(), 0.5),
+      waitFor(2),
+
+      fadeIn(captionRef(), 2),
+      typeText(
+        captionTxt,
+        'An embedding is a dense numerical vector that captures the semantic meaning of text in high-dimensional space.',
+        2.8
+      ),
+
+      waitFor(remainingTime)
     )
   );
 });

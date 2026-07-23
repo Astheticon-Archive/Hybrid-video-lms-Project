@@ -1,21 +1,26 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "jsxImportSource": "@revideo/2d/lib",
-    "outDir": "./build",
-    "paths": {
-      "@revideo/2d/lib/jsx-runtime": ["./node_modules/@revideo/2d/lib/jsx-runtime.d.ts"]
-    }
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "types": [
+      "react",
+      "react-dom"
+    ]
   },
   "include": [
-    "src/**/*"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "templates/**/*.ts",
+    "templates/**/*.tsx",
+    "git/**/*.ts",
+    "git/**/*.tsx"
   ]
 }
