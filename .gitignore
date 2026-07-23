@@ -66,6 +66,7 @@ docker-compose.override.yml
 # Temporary output and render cache files
 render-output/
 generated_audio/
+tmp_*
 *.mp4
 *.wav
 *.mp3
