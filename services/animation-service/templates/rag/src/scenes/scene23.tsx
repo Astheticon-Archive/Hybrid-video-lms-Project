@@ -40,7 +40,7 @@ export default makeScene2D('scene23', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -51,21 +51,21 @@ export default makeScene2D('scene23', function* (view) {
         </Rect>
 
         {/* Retrieved docs label */}
-        <Rect ref={retrievedLabelRef} x={-530} y={-250} opacity={0}>
+        <Rect ref={retrievedLabelRef} x={-530} y={-250} opacity={1}>
           <Badge text={'RETRIEVED: top-20'} color={THEME.colors.primary} />
         </Rect>
 
         {/* Four retrieved docs stacked */}
-        <Rect ref={doc1Ref} x={-530} y={-100} opacity={0}>
+        <Rect ref={doc1Ref} x={-530} y={-100} opacity={1}>
           <Document linesCount={3} highlightedLine={0} highlightColor={THEME.colors.primary} />
         </Rect>
-        <Rect ref={doc2Ref} x={-530} y={-20} opacity={0}>
+        <Rect ref={doc2Ref} x={-530} y={-20} opacity={1}>
           <Document linesCount={3} highlightedLine={1} highlightColor={THEME.colors.textMuted} />
         </Rect>
-        <Rect ref={doc3Ref} x={-530} y={60} opacity={0}>
+        <Rect ref={doc3Ref} x={-530} y={60} opacity={1}>
           <Document linesCount={3} highlightedLine={0} highlightColor={THEME.colors.textMuted} />
         </Rect>
-        <Rect ref={doc4Ref} x={-530} y={140} opacity={0}>
+        <Rect ref={doc4Ref} x={-530} y={140} opacity={1}>
           <Document linesCount={3} highlightedLine={-1} />
         </Rect>
 
@@ -79,7 +79,7 @@ export default makeScene2D('scene23', function* (view) {
           y={20}
           width={300}
           height={200}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
           showGlow={true}
           alignItems={'center'}
@@ -94,15 +94,15 @@ export default makeScene2D('scene23', function* (view) {
         <AnimatedArrow ref={arrow2Ref} points={[[160, 20], [300, 20]]} glowColor={THEME.colors.success} />
 
         {/* Top-N label */}
-        <Rect ref={topNLabelRef} x={520} y={-200} opacity={0}>
+        <Rect ref={topNLabelRef} x={520} y={-200} opacity={1}>
           <Badge text={'TOP-3 FINAL'} color={THEME.colors.success} />
         </Rect>
 
         {/* Final top results */}
-        <Rect ref={result1Ref} x={520} y={-20} opacity={0}>
+        <Rect ref={result1Ref} x={520} y={-20} opacity={1}>
           <Document linesCount={3} highlightedLine={0} highlightColor={THEME.colors.success} />
         </Rect>
-        <Rect ref={result2Ref} x={520} y={80} opacity={0}>
+        <Rect ref={result2Ref} x={520} y={80} opacity={1}>
           <Document linesCount={3} highlightedLine={1} highlightColor={THEME.colors.success} />
         </Rect>
 
@@ -111,7 +111,7 @@ export default makeScene2D('scene23', function* (view) {
           ref={captionRef}
           text={''}
           y={370}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -125,59 +125,7 @@ export default makeScene2D('scene23', function* (view) {
     cameraRef().position.x(5, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Fade in retrieved docs label
-      fadeIn(retrievedLabelRef(), 0.5),
-      waitFor(2),
-
-      // Pop in all four docs
-      all(
-        popIn(doc1Ref(), 0.4),
-        chain(waitFor(2), popIn(doc2Ref(), 0.4)),
-        chain(waitFor(2), popIn(doc3Ref(), 0.4)),
-        chain(waitFor(2), popIn(doc4Ref(), 0.4))
-      ),
-      waitFor(2),
-
-      // Draw arrow to re-ranker
-      drawIn(arrow1Ref(), 0.5),
-      waitFor(2),
-
-      // Pop in re-ranker
-      popIn(rerankerCardRef(), 0.6),
-      waitFor(2),
-
-      // Slide low-scoring docs away
-      all(
-        slideOutTo(doc3Ref(), 0, 60, 0.4),
-        slideOutTo(doc4Ref(), 0, 80, 0.4)
-      ),
-      waitFor(2),
-
-      // Draw arrow to results
-      drawIn(arrow2Ref(), 0.5),
-      waitFor(2),
-
-      // Pop in final results
-      fadeIn(topNLabelRef(), 0.4),
-      all(
-        popIn(result1Ref(), 0.5),
-        chain(waitFor(2), popIn(result2Ref(), 0.5))
-      ),
-      waitFor(2),
-
-      fadeIn(captionRef(), 0.5),
-      typeText(
-        captionTxt,
-        'A re-ranker cross-encodes query-document pairs for precision scoring, promoting the most relevant chunks to the top.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'A re-ranker cross-encodes query-document pairs for precision scoring, promoting the most relevant chunks to the top.', 8.21)
     )
   );
 });

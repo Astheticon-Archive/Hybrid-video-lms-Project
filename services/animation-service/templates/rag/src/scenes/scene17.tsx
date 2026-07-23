@@ -31,7 +31,7 @@ export default makeScene2D('scene17', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -55,7 +55,7 @@ export default makeScene2D('scene17', function* (view) {
           x={-280}
           y={50}
         />
-        <Rect ref={labelARef} x={-150} y={-80} opacity={0}>
+        <Rect ref={labelARef} x={-150} y={-80} opacity={1}>
           <Txt fontFamily={THEME.fonts.main} fontSize={20} fontWeight={700} fill={THEME.colors.primary} text={'Query (A)'} />
         </Rect>
 
@@ -73,7 +73,7 @@ export default makeScene2D('scene17', function* (view) {
           x={-280}
           y={50}
         />
-        <Rect ref={labelBRef} x={-200} y={-20} opacity={0}>
+        <Rect ref={labelBRef} x={-200} y={-20} opacity={1}>
           <Txt fontFamily={THEME.fonts.main} fontSize={20} fontWeight={700} fill={THEME.colors.success} text={'Close Match (B)'} />
         </Rect>
 
@@ -91,7 +91,7 @@ export default makeScene2D('scene17', function* (view) {
           x={-280}
           y={50}
         />
-        <Rect ref={labelCRef} x={-420} y={-60} opacity={0}>
+        <Rect ref={labelCRef} x={-420} y={-60} opacity={1}>
           <Txt fontFamily={THEME.fonts.main} fontSize={20} fontWeight={700} fill={THEME.colors.error} text={'Far Match (C)'} />
         </Rect>
 
@@ -102,7 +102,7 @@ export default makeScene2D('scene17', function* (view) {
           y={-60}
           width={380}
           height={160}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
           showGlow={true}
         >
@@ -124,7 +124,7 @@ export default makeScene2D('scene17', function* (view) {
           y={120}
           width={380}
           height={120}
-          opacity={0}
+          opacity={1}
         >
           <Txt fontFamily={THEME.fonts.main} fontSize={16} fill={THEME.colors.textMuted} text={'Score range: –1 (opposite) → +1 (identical)'} textAlign={'center'} />
           <Txt fontFamily={THEME.fonts.main} fontSize={16} fontWeight={700} fill={THEME.colors.success} text={'Smaller angle = Higher similarity'} textAlign={'center'} marginTop={8} />
@@ -135,7 +135,7 @@ export default makeScene2D('scene17', function* (view) {
           ref={captionRef}
           text={''}
           y={420}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -149,41 +149,7 @@ export default makeScene2D('scene17', function* (view) {
     cameraRef().position.y(-10, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Draw vectors
-      all(
-        drawIn(vectorALineRef(), 0.6),
-        chain(waitFor(2), drawIn(vectorBLineRef(), 0.6)),
-        chain(waitFor(2), drawIn(vectorCLineRef(), 0.6))
-      ),
-      waitFor(2),
-
-      // Pop labels
-      all(
-        popIn(labelARef(), 0.4),
-        popIn(labelBRef(), 0.4),
-        popIn(labelCRef(), 0.4)
-      ),
-      waitFor(2),
-
-      // Pop formula and score cards
-      popIn(formulaCardRef(), 0.6),
-      waitFor(2),
-      popIn(scoreCardRef(), 0.5),
-      waitFor(2),
-
-      fadeIn(captionRef(), 2),
-      typeText(
-        captionTxt,
-        'Cosine similarity measures the angle between two vectors. A smaller angle means greater semantic similarity.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'Cosine similarity measures the angle between two vectors. A smaller angle means greater semantic similarity.', 8.78)
     )
   );
 });

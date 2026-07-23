@@ -35,7 +35,7 @@ export default makeScene2D('scene1', function* (view) {
           direction={'row'}
           gap={32}
           y={100}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'ACCURACY'} color={THEME.colors.primary} />
           <Badge text={'KNOWLEDGE'} color={THEME.colors.cyan} />
@@ -47,7 +47,7 @@ export default makeScene2D('scene1', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
       </Rect>
     </Background>
@@ -65,24 +65,7 @@ export default makeScene2D('scene1', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(0.5),
-
-      // Pop in title
-      popIn(titleRef(), 0.8),
-      waitFor(0.5),
-
-      // Fade in badges
-      fadeIn(badgesRef(), 0.6),
-      waitFor(0.5),
-
-      // Fade in Caption container
-      fadeIn(captionRef(), 0.5),
-
-      // Type out explanation text
-      typeText(captionTxt, 'Retrieval-Augmented Generation (RAG) is a technique that enhances LLMs with external data.', 2.5),
-
-      // Wait for the remainder of the 75s duration
-      waitFor(15)
+      typeText(captionTxt, 'Retrieval-Augmented Generation (RAG) is a technique that enhances LLMs with external data.', 7.34)
     )
   );
 });

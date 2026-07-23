@@ -35,7 +35,7 @@ export default makeScene2D('scene6', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -47,8 +47,8 @@ export default makeScene2D('scene6', function* (view) {
 
 
         {/* Large Original Document */}
-        <Rect ref={originalDocRef} x={-400} y={0} opacity={0} alignItems={'center'}>
-          ref={sourceDocRef} x={0} y={210} opacity={0} layout direction={'row'} alignItems={'center'} gap={20}
+        <Rect ref={originalDocRef} x={-400} y={0} opacity={1} alignItems={'center'}>
+          ref={sourceDocRef} x={0} y={210} opacity={1} layout direction={'row'} alignItems={'center'} gap={20}
           <Document linesCount={5} highlightedLine={-1} />
           <Txt
             fontFamily={THEME.fonts.main}
@@ -68,7 +68,7 @@ export default makeScene2D('scene6', function* (view) {
           y={-160}
           width={350}
           height={125}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'CHUNK 1 (Intro)'} color={THEME.colors.cyan} marginBottom={14} />
           <Rect layout direction={'row'} gap={6} width={'100%'}>
@@ -83,7 +83,7 @@ export default makeScene2D('scene6', function* (view) {
           y={0}
           width={350}
           height={125}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'CHUNK 2 (Details)'} color={THEME.colors.cyan} marginBottom={14} />
           <Rect layout direction={'row'} gap={6} width={'100%'}>
@@ -98,7 +98,7 @@ export default makeScene2D('scene6', function* (view) {
           y={160}
           width={350}
           height={125}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'CHUNK 3 (Summary)'} color={THEME.colors.cyan} marginBottom={14} />
           <Rect layout direction={'row'} gap={6} width={'100%'}>
@@ -128,7 +128,7 @@ export default makeScene2D('scene6', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -144,37 +144,7 @@ export default makeScene2D('scene6', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop in original document
-      popIn(originalDocRef(), 2),
-      waitFor(2),
-
-      // Draw all arrows in parallel to represent splitting
-      all(
-        drawIn(arrow1Ref(), 2),
-        drawIn(arrow2Ref(), 2),
-        drawIn(arrow3Ref(), 2)
-      ),
-      waitFor(2),
-
-      // Pop in Chunk cards
-      all(
-        popIn(chunk1Ref(), 2),
-        popIn(chunk2Ref(), 2),
-        popIn(chunk3Ref(), 2)
-      ),
-      waitFor(2),
-
-      // Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'We chunk documents into smaller paragraphs to make sure RAG retrieves highly specific context.', 2.8),
-
-      waitFor(15)
+      typeText(captionTxt, 'We chunk documents into smaller paragraphs to make sure RAG retrieves highly specific context.', 7.39)
     )
   );
 });

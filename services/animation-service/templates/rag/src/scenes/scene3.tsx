@@ -28,7 +28,7 @@ export default makeScene2D('scene3', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -56,7 +56,7 @@ export default makeScene2D('scene3', function* (view) {
             y={0}
             size={24}
             fill={THEME.colors.textMuted}
-            opacity={0}
+            opacity={1}
           >
             <Txt
               y={40}
@@ -75,7 +75,7 @@ export default makeScene2D('scene3', function* (view) {
             y={0}
             size={24}
             fill={THEME.colors.textMuted}
-            opacity={0}
+            opacity={1}
           >
             <Txt
               y={40}
@@ -94,7 +94,7 @@ export default makeScene2D('scene3', function* (view) {
             y={-120}
             width={260}
             height={130}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.warning}
             showGlow={true}
           >
@@ -124,7 +124,7 @@ export default makeScene2D('scene3', function* (view) {
             y={120}
             width={260}
             height={130}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.error}
           >
             <Badge text={'FUTURE EVENT'} color={THEME.colors.error} marginBottom={6} />
@@ -150,7 +150,7 @@ export default makeScene2D('scene3', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -166,36 +166,7 @@ export default makeScene2D('scene3', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Draw timeline
-      drawIn(timelineLineRef(), 2),
-      waitFor(2),
-
-      // Fade in points 2023 & 2024
-      all(
-        fadeIn(year2023Ref(), 2),
-        fadeIn(year2024Ref(), 2)
-      ),
-      waitFor(2),
-
-      // Pop in the Cutoff date
-      popIn(cutoffRef(), 2),
-      waitFor(2),
-
-      // Pop in the 2026 Future event (past the cutoff date)
-      popIn(event2026Ref(), 2),
-      waitFor(2),
-
-      // Fade in Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'LLMs are limited by a static knowledge cutoff date. They are blind to events after this point.', 2.8),
-
-      waitFor(15)
+      typeText(captionTxt, 'LLMs are limited by a static knowledge cutoff date. They are blind to events after this point.', 7.97)
     )
   );
 });

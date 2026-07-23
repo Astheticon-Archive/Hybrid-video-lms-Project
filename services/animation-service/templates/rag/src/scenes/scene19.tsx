@@ -28,7 +28,7 @@ export default makeScene2D('scene19', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -45,7 +45,7 @@ export default makeScene2D('scene19', function* (view) {
           y={-20}
           width={320}
           height={280}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'DOCUMENT CHUNK'} color={THEME.colors.primary} marginBottom={14} />
           <Txt fontFamily={THEME.fonts.mono} fontSize={15} fill={THEME.colors.textMuted} text={'"...The transformer\narchitecture was\nproposed in 2017..."'} textWrap={true} textAlign={'center'} />
@@ -58,7 +58,7 @@ export default makeScene2D('scene19', function* (view) {
           y={-20}
           width={420}
           height={280}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
           showGlow={true}
         >
@@ -84,13 +84,13 @@ export default makeScene2D('scene19', function* (view) {
         </Card>
 
         {/* Filter badges below */}
-        <Rect ref={filter1Ref} x={-240} y={200} opacity={0}>
+        <Rect ref={filter1Ref} x={-240} y={200} opacity={1}>
           <Badge text={'FILTER: date > 2020'} color={THEME.colors.warning} />
         </Rect>
-        <Rect ref={filter2Ref} x={60} y={200} opacity={0}>
+        <Rect ref={filter2Ref} x={60} y={200} opacity={1}>
           <Badge text={'FILTER: topic = NLP'} color={THEME.colors.cyan} />
         </Rect>
-        <Rect ref={filter3Ref} x={360} y={200} opacity={0}>
+        <Rect ref={filter3Ref} x={360} y={200} opacity={1}>
           <Badge text={'FILTER: source = arxiv'} color={THEME.colors.purple} />
         </Rect>
 
@@ -99,7 +99,7 @@ export default makeScene2D('scene19', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -113,34 +113,7 @@ export default makeScene2D('scene19', function* (view) {
     cameraRef().position.y(10, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Pop in document and metadata cards
-      all(
-        popIn(docCardRef(), 2),
-        chain(waitFor(2), slideInFrom(metaCardRef(), 60, 0, 2))
-      ),
-      waitFor(2),
-
-      // Slide in filter badges
-      all(
-        slideInFrom(filter1Ref(), 0, 30, 2),
-        chain(waitFor(2), slideInFrom(filter2Ref(), 0, 30, 2)),
-        chain(waitFor(2), slideInFrom(filter3Ref(), 0, 30, 2))
-      ),
-      waitFor(2),
-
-      fadeIn(captionRef(), 2),
-      typeText(
-        captionTxt,
-        'Metadata tags each chunk with source, date, and topic — enabling pre-filtering before vector search.',
-        2.6
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'Metadata tags each chunk with source, date, and topic — enabling pre-filtering before vector search.', 7.73)
     )
   );
 });

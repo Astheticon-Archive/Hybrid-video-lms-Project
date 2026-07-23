@@ -32,7 +32,7 @@ export default makeScene2D('scene10', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -49,7 +49,7 @@ export default makeScene2D('scene10', function* (view) {
           y={-120}
           width={320}
           height={140}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'QUESTION'} color={THEME.colors.primary} marginBottom={6} />
           <Txt fontFamily={THEME.fonts.main} fontSize={18} fill={THEME.colors.text} text={'“What is RAG?”'} />
@@ -62,7 +62,7 @@ export default makeScene2D('scene10', function* (view) {
           y={120}
           width={320}
           height={140}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
         >
           <Badge text={'RETRIEVED CONTEXT'} color={THEME.colors.cyan} marginBottom={6} />
@@ -84,7 +84,7 @@ export default makeScene2D('scene10', function* (view) {
         />
 
         {/* Augmented Prompt Box */}
-        <Rect ref={promptBoxContainerRef} x={280} y={0} opacity={0}>
+        <Rect ref={promptBoxContainerRef} x={280} y={0} opacity={1}>
           <PromptBox
             ref={promptBoxRef}
             questionText={'What is RAG?'}
@@ -98,7 +98,7 @@ export default makeScene2D('scene10', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -114,42 +114,7 @@ export default makeScene2D('scene10', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 0.6),
-
-      // Pop in original question and context cards
-      all(
-        popIn(questionCardRef(), 0.6),
-        popIn(contextCardRef(), 0.6)
-      ),
-      waitFor(2),
-
-      // Pop in target prompt assembler
-      popIn(promptBoxContainerRef(), 0.8),
-      waitFor(2),
-
-      // Draw merging arrows
-      all(
-        drawIn(arrow1Ref(), 0.7),
-        drawIn(arrow2Ref(), 0.7)
-      ),
-      waitFor(2),
-
-      // Make target prompt glow
-      all(
-        promptBoxRef().stroke(THEME.colors.primary, 0.4),
-        promptBoxRef().shadowColor(THEME.colors.primary, 0.4),
-        promptBoxRef().shadowBlur(25, 0.4)
-      ),
-      waitFor(2),
-
-      // Caption
-      fadeIn(captionRef(), 0.5),
-      typeText(captionTxt, 'We inject the retrieved context alongside the user question, packing them into an augmented prompt.', 2.8),
-
-      waitFor(15)
+      typeText(captionTxt, 'We inject the retrieved context alongside the user question, packing them into an augmented prompt.', 7.68)
     )
   );
 });

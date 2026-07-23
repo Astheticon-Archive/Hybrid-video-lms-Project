@@ -53,7 +53,7 @@ export default makeScene2D('scene30', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={44}
@@ -66,7 +66,7 @@ export default makeScene2D('scene30', function* (view) {
         {/* TOP ROW: Documents → Embed → VectorDB */}
 
         {/* Documents */}
-        <Rect ref={docContainerRef} x={-700} y={-130} opacity={0}>
+        <Rect ref={docContainerRef} x={-700} y={-130} opacity={1}>
           <Document linesCount={4} highlightedLine={1} highlightColor={THEME.colors.primary} />
         </Rect>
 
@@ -79,7 +79,7 @@ export default makeScene2D('scene30', function* (view) {
           y={-130}
           width={200}
           height={110}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
           showGlow={true}
           alignItems={'center'}
@@ -92,7 +92,7 @@ export default makeScene2D('scene30', function* (view) {
         <AnimatedArrow ref={arrow2Ref} points={[[-280, -130], [-190, -130]]} glowColor={THEME.colors.cyan} />
 
         {/* VectorDB */}
-        <Rect ref={dbContainerRef} x={-80} y={-130} opacity={0} scale={0.65}>
+        <Rect ref={dbContainerRef} x={-80} y={-130} opacity={1} scale={0.65}>
           <Database label={'VECTOR DB'} glow={true} />
         </Rect>
 
@@ -106,7 +106,7 @@ export default makeScene2D('scene30', function* (view) {
           y={100}
           width={200}
           height={110}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.primary}
           showGlow={true}
           alignItems={'center'}
@@ -119,7 +119,7 @@ export default makeScene2D('scene30', function* (view) {
         <AnimatedArrow ref={arrow4Ref} points={[[-590, 100], [160, 100]]} glowColor={THEME.colors.primary} />
 
         {/* Prompt box */}
-        <Rect ref={promptContainerRef} x={370} y={80} opacity={0} scale={0.6}>
+        <Rect ref={promptContainerRef} x={370} y={80} opacity={1} scale={0.6}>
           <PromptBox
             questionText={'What is RAG?'}
             contextText={'Retrieved: RAG combines retrieval with generation...'}
@@ -136,7 +136,7 @@ export default makeScene2D('scene30', function* (view) {
           y={80}
           width={180}
           height={110}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
           showGlow={true}
           alignItems={'center'}
@@ -153,7 +153,7 @@ export default makeScene2D('scene30', function* (view) {
           y={270}
           width={700}
           height={100}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.success}
           showGlow={true}
           alignItems={'center'}
@@ -167,7 +167,7 @@ export default makeScene2D('scene30', function* (view) {
           ref={captionRef}
           text={''}
           y={420}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -182,46 +182,7 @@ export default makeScene2D('scene30', function* (view) {
     cameraRef().position.y(10, 8),
 
     chain(
-      waitFor(1),
-
-      // Title
-      fadeIn(titleRef(), 0.7),
-      waitFor(2),
-
-      // Ingestion path
-      popIn(docContainerRef(), 4),
-      drawIn(arrow1Ref(), 4),
-      popIn(embedCardRef(), 4),
-      drawIn(arrow2Ref(), 4),
-      popIn(dbContainerRef(), 4, 0.65),
-      waitFor(4),
-
-      // Query path
-      popIn(queryCardRef(), 4),
-      drawIn(arrow4Ref(), 4),
-      drawIn(arrow3Ref(), 4),
-
-      // Prompt + LLM
-      popIn(promptContainerRef(), 4, 0.6),
-      drawIn(arrow5Ref(), 4),
-      popIn(llmCardRef(), 4),
-      waitFor(4),
-
-      // Pulse the DB as the connection point
-
-
-      // Final answer
-      popIn(answerCardRef(), 4),
-      waitFor(2),
-
-      fadeIn(captionRef(), 0.5),
-      typeText(
-        captionTxt,
-        'RAG: Documents → Embeddings → Vector DB → Retrieval → Augmented Prompt → Grounded LLM Answer. That\'s the full picture!',
-        3.2
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'RAG: Documents → Embeddings → Vector DB → Retrieval → Augmented Prompt → Grounded LLM Answer. That\', 8.93)
     )
   );
 });

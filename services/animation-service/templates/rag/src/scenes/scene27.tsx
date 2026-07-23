@@ -27,7 +27,7 @@ export default makeScene2D('scene27', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-380} opacity={0}>
+        <Rect ref={titleRef} y={-380} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -44,7 +44,7 @@ export default makeScene2D('scene27', function* (view) {
             ref={lim1Ref}
             width={480}
             height={160}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.error}
           >
             <Badge text={'LATENCY'} color={THEME.colors.error} marginBottom={10} />
@@ -55,7 +55,7 @@ export default makeScene2D('scene27', function* (view) {
             ref={lim2Ref}
             width={480}
             height={160}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.error}
           >
             <Badge text={'CHUNK QUALITY'} color={THEME.colors.error} marginBottom={10} />
@@ -66,7 +66,7 @@ export default makeScene2D('scene27', function* (view) {
             ref={lim3Ref}
             width={480}
             height={160}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.warning}
           >
             <Badge text={'CONTEXT LIMIT'} color={THEME.colors.warning} marginBottom={10} />
@@ -77,7 +77,7 @@ export default makeScene2D('scene27', function* (view) {
             ref={lim4Ref}
             width={480}
             height={160}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.warning}
           >
             <Badge text={'STALE DATA'} color={THEME.colors.warning} marginBottom={10} />
@@ -87,7 +87,7 @@ export default makeScene2D('scene27', function* (view) {
         </Rect>
 
         {/* Note badge */}
-        <Rect ref={noteRef} y={230} opacity={0}>
+        <Rect ref={noteRef} y={230} opacity={1}>
           <Badge text={'Mitigations exist — but require careful engineering'} color={'rgba(239,68,68,0.25)'} textColor={THEME.colors.error} />
         </Rect>
 
@@ -96,7 +96,7 @@ export default makeScene2D('scene27', function* (view) {
           ref={captionRef}
           text={''}
           y={380}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -110,35 +110,7 @@ export default makeScene2D('scene27', function* (view) {
     cameraRef().position.y(5, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Pop in limitation cards with slight shake on each
-      popIn(lim1Ref(), 4),
-      shakeNode(lim1Ref(), 8, 4),
-
-      popIn(lim2Ref(), 4),
-      shakeNode(lim2Ref(), 8, 4),
-
-      popIn(lim3Ref(), 4),
-      shakeNode(lim3Ref(), 8, 4),
-
-      popIn(lim4Ref(), 4),
-      waitFor(2),
-
-      popIn(noteRef(), 4),
-      waitFor(2),
-
-      fadeIn(captionRef(), 4),
-      typeText(
-        captionTxt,
-        'RAG has real trade-offs: latency, chunking quality, context limits, and stale data must all be managed.',
-        2.6
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'RAG has real trade-offs: latency, chunking quality, context limits, and stale data must all be managed.', 8.90)
     )
   );
 });

@@ -26,7 +26,7 @@ export default makeScene2D('scene24', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -43,7 +43,7 @@ export default makeScene2D('scene24', function* (view) {
           y={-10}
           width={320}
           height={280}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
           showGlow={true}
         >
@@ -58,7 +58,7 @@ export default makeScene2D('scene24', function* (view) {
         </Card>
 
         {/* PromptBox in the center */}
-        <Rect ref={promptBoxRef} x={60} y={-10} opacity={0}>
+        <Rect ref={promptBoxRef} x={60} y={-10} opacity={1}>
           <PromptBox
             questionText={'How does RAG reduce hallucination?'}
             contextText={'RAG grounds the model by injecting retrieved facts directly into the prompt...'}
@@ -73,7 +73,7 @@ export default makeScene2D('scene24', function* (view) {
           y={-10}
           width={300}
           height={280}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.success}
         >
           <Badge text={'BEST PRACTICES'} color={THEME.colors.success} marginBottom={14} />
@@ -91,7 +91,7 @@ export default makeScene2D('scene24', function* (view) {
           ref={captionRef}
           text={''}
           y={360}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -105,31 +105,7 @@ export default makeScene2D('scene24', function* (view) {
     cameraRef().position.y(-5, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Slide in system card from left
-      slideInFrom(systemCardRef(), -60, 0, 0.6),
-      waitFor(8),
-
-      // Pop in prompt box center
-      popIn(promptBoxRef(), 0.7),
-      waitFor(8),
-
-      // Slide in tips card from right
-      slideInFrom(tipsCardRef(), 60, 0, 0.6),
-      waitFor(8),
-
-      fadeIn(captionRef(), 0.5),
-      typeText(
-        captionTxt,
-        'A well-crafted system prompt tells the model to ground answers in retrieved context and admit uncertainty.',
-        2.6
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'A well-crafted system prompt tells the model to ground answers in retrieved context and admit uncertainty.', 7.92)
     )
   );
 });

@@ -29,7 +29,7 @@ export default makeScene2D('scene14', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -46,7 +46,7 @@ export default makeScene2D('scene14', function* (view) {
           y={-20}
           width={260}
           height={160}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'RAW TEXT'} color={THEME.colors.primary} marginBottom={12} />
           <Txt
@@ -72,7 +72,7 @@ export default makeScene2D('scene14', function* (view) {
           y={-20}
           width={280}
           height={160}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.primary}
           showGlow={true}
         >
@@ -106,13 +106,13 @@ export default makeScene2D('scene14', function* (view) {
           ref={vectorRef}
           x={450}
           y={-20}
-          opacity={0}
+          opacity={1}
           values={[0.82, -0.41, 0.09, 0.95, -0.73, 0.36]}
           glow={true}
         />
 
         {/* Dimensionality label */}
-        <Rect ref={dimLabelRef} x={450} y={70} opacity={0}>
+        <Rect ref={dimLabelRef} x={450} y={70} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={16}
@@ -126,7 +126,7 @@ export default makeScene2D('scene14', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -141,37 +141,7 @@ export default makeScene2D('scene14', function* (view) {
     cameraRef().position.x(10, 8),
 
     chain(
-      waitFor(2),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      popIn(textCardRef(), 0.6),
-      waitFor(2),
-
-      drawIn(arrow1Ref(), 0.5),
-      waitFor(1),
-
-      popIn(encoderCardRef(), 0.6),
-      waitFor(2),
-
-      drawIn(arrow2Ref(), 0.5),
-      waitFor(1),
-
-      popIn(vectorRef(), 0.7),
-      waitFor(2),
-
-      fadeIn(dimLabelRef(), 0.5),
-      waitFor(2),
-
-      fadeIn(captionRef(), 2),
-      typeText(
-        captionTxt,
-        'An embedding is a dense numerical vector that captures the semantic meaning of text in high-dimensional space.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'An embedding is a dense numerical vector that captures the semantic meaning of text in high-dimensional space.', 8.21)
     )
   );
 });

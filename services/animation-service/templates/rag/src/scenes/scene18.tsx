@@ -28,7 +28,7 @@ export default makeScene2D('scene18', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -39,7 +39,7 @@ export default makeScene2D('scene18', function* (view) {
         </Rect>
 
         {/* Source Document */}
-        <Rect ref={sourceDocRef} x={0} y={-210} opacity={0} layout direction={'row'} alignItems={'center'} gap={20}>
+        <Rect ref={sourceDocRef} x={0} y={-210} opacity={1} layout direction={'row'} alignItems={'center'} gap={20}>
           <Document linesCount={5} highlightedLine={-1} />
           <Txt
             fontFamily={THEME.fonts.main}
@@ -57,7 +57,7 @@ export default makeScene2D('scene18', function* (view) {
           y={80}
           width={300}
           height={220}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.primary}
         >
           <Badge text={'FIXED SIZE'} color={THEME.colors.primary} marginBottom={12} />
@@ -71,7 +71,7 @@ export default makeScene2D('scene18', function* (view) {
           y={80}
           width={300}
           height={220}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
           showGlow={true}
         >
@@ -86,7 +86,7 @@ export default makeScene2D('scene18', function* (view) {
           y={80}
           width={300}
           height={220}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
         >
           <Badge text={'SLIDING WINDOW'} color={THEME.colors.purple} marginBottom={12} />
@@ -99,7 +99,7 @@ export default makeScene2D('scene18', function* (view) {
           ref={captionRef}
           text={''}
           y={380}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -113,30 +113,7 @@ export default makeScene2D('scene18', function* (view) {
     cameraRef().position.x(10, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      slideInFrom(sourceDocRef(), 0, -40, 0.6),
-      waitFor(2),
-
-      // Pop in three strategy cards
-      all(
-        popIn(fixedCardRef(), 2),
-        chain(waitFor(2), popIn(semanticCardRef(), 2)),
-        chain(waitFor(2), popIn(slidingCardRef(), 2))
-      ),
-      waitFor(2),
-
-      fadeIn(captionRef(), 2),
-      typeText(
-        captionTxt,
-        'Chunking breaks documents into manageable pieces. Semantic chunking preserves meaning; sliding windows preserve context.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'Chunking breaks documents into manageable pieces. Semantic chunking preserves meaning; sliding windows preserve context.', 9.65)
     )
   );
 });

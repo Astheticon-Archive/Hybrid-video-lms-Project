@@ -31,7 +31,7 @@ export default makeScene2D('scene21', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -50,7 +50,7 @@ export default makeScene2D('scene21', function* (view) {
           x={-330}
           y={10}
           alignItems={'center'}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'DENSE RETRIEVAL'} color={THEME.colors.cyan} />
           <Vector values={[0.82, -0.41, 0.09, 0.95]} glow={true} />
@@ -65,7 +65,7 @@ export default makeScene2D('scene21', function* (view) {
         </Rect>
 
         {/* Vertical divider */}
-        <Rect ref={dividerRef} x={0} y={30} width={2} height={350} fill={'rgba(148,163,184,0.2)'} opacity={0} />
+        <Rect ref={dividerRef} x={0} y={30} width={2} height={350} fill={'rgba(148,163,184,0.2)'} opacity={1} />
 
         {/* Sparse column */}
         <Rect
@@ -76,7 +76,7 @@ export default makeScene2D('scene21', function* (view) {
           x={330}
           y={10}
           alignItems={'center'}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'SPARSE RETRIEVAL'} color={THEME.colors.warning} />
           <Card width={320} height={60} alignItems={'center'} justifyContent={'center'}>
@@ -97,7 +97,7 @@ export default makeScene2D('scene21', function* (view) {
           ref={captionRef}
           text={''}
           y={400}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -111,27 +111,7 @@ export default makeScene2D('scene21', function* (view) {
     cameraRef().position.x(5, 8),
 
     chain(
-      waitFor(0.4),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(0.3),
-
-      fadeIn(dividerRef(), 0.4),
-
-      all(
-        slideInFrom(denseColRef(), -60, 0, 0.7),
-        chain(waitFor(0.2), slideInFrom(sparseColRef(), 60, 0, 0.7))
-      ),
-      waitFor(0.5),
-
-      fadeIn(captionRef(), 0.5),
-      typeText(
-        captionTxt,
-        'Dense retrieval captures meaning but is compute-heavy. Sparse retrieval is fast but keyword-bound. Use both together.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'Dense retrieval captures meaning but is compute-heavy. Sparse retrieval is fast but keyword-bound. Use both together.', 10.49)
     )
   );
 });

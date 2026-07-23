@@ -29,7 +29,7 @@ export default makeScene2D('scene8', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -40,7 +40,7 @@ export default makeScene2D('scene8', function* (view) {
         </Rect>
 
         {/* DB Cylinder stack on the right */}
-        <Rect ref={dbContainerRef} x={300} y={0} opacity={0}>
+        <Rect ref={dbContainerRef} x={300} y={0} opacity={1}>
           <Database ref={dbRef} glow={false} />
         </Rect>
 
@@ -49,7 +49,7 @@ export default makeScene2D('scene8', function* (view) {
           ref={vec1Ref}
           x={-400}
           y={-120}
-          opacity={0}
+          opacity={1}
           values={[0.15, -0.92, 0.44]}
           glow={true}
         />
@@ -58,7 +58,7 @@ export default makeScene2D('scene8', function* (view) {
           ref={vec2Ref}
           x={-400}
           y={0}
-          opacity={0}
+          opacity={1}
           values={[0.88, 0.03, -0.56]}
           glow={true}
         />
@@ -67,7 +67,7 @@ export default makeScene2D('scene8', function* (view) {
           ref={vec3Ref}
           x={-400}
           y={120}
-          opacity={0}
+          opacity={1}
           values={[-0.31, 0.65, 0.12]}
           glow={true}
         />
@@ -77,7 +77,7 @@ export default makeScene2D('scene8', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -93,62 +93,7 @@ export default makeScene2D('scene8', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop in Vector DB
-      popIn(dbContainerRef(), 2),
-      waitFor(2),
-
-      // Pop in vectors
-      all(
-        popIn(vec1Ref(), 2),
-        popIn(vec2Ref(), 2),
-        popIn(vec3Ref(), 2)
-      ),
-      waitFor(2),
-
-      // Slide Vector 1 into the DB, and pulse DB
-      chain(
-        all(
-          slideOutTo(vec1Ref(), 600, 100, 2),
-          chain(
-            waitFor(2),
-            pulseScale(dbRef(), 1.08, 2)
-          )
-        ),
-        waitFor(2),
-
-        // Slide Vector 2 into the DB
-        all(
-          slideOutTo(vec2Ref(), 600, 0, 2),
-          chain(
-            waitFor(2),
-            pulseScale(dbRef(), 1.10, 4)
-          )
-        ),
-        waitFor(2),
-
-        // Slide Vector 3 into the DB
-        all(
-          slideOutTo(vec3Ref(), 600, -100, 2),
-          chain(
-            waitFor(2),
-            pulseScale(dbRef(), 1.12, 6)
-          )
-        )
-      ),
-
-      waitFor(2),
-
-      // Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'Vector databases index these embeddings in high-dimensional spaces to find semantic connections instantly.', 2.8),
-
-      waitFor(15)
+      typeText(captionTxt, 'Vector databases index these embeddings in high-dimensional spaces to find semantic connections instantly.', 8.21)
     )
   );
 });

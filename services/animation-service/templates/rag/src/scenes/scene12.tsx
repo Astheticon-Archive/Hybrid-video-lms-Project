@@ -48,7 +48,7 @@ export default makeScene2D('scene12', function* (view) {
           y={0}
           width={600}
           height={300}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.primary}
           showGlow={true}
           alignItems={'center'}
@@ -75,7 +75,7 @@ export default makeScene2D('scene12', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -91,20 +91,7 @@ export default makeScene2D('scene12', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(0.5),
-
-
-
-      // Animate List items in sequence
-
-
-      // Fade out advantages list & title, and fade in bottom caption
-
-
-      // Pop in Thank You Card
-      popIn(thankYouRef(), 0.8),
-
-      waitFor(15)
+      waitFor(2.45)
     )
   );
 });

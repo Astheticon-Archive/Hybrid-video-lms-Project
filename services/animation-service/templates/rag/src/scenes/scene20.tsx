@@ -24,7 +24,7 @@ export default makeScene2D('scene20', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-390} opacity={0}>
+        <Rect ref={titleRef} y={-390} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -41,7 +41,7 @@ export default makeScene2D('scene20', function* (view) {
           y={10}
           width={340}
           height={300}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
           showGlow={true}
         >
@@ -58,7 +58,7 @@ export default makeScene2D('scene20', function* (view) {
           y={10}
           width={340}
           height={300}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.warning}
         >
           <Badge text={'SPARSE'} color={THEME.colors.warning} marginBottom={16} />
@@ -74,7 +74,7 @@ export default makeScene2D('scene20', function* (view) {
           y={10}
           width={340}
           height={300}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.success}
           showGlow={true}
         >
@@ -89,7 +89,7 @@ export default makeScene2D('scene20', function* (view) {
           ref={captionRef}
           text={''}
           y={380}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -103,27 +103,7 @@ export default makeScene2D('scene20', function* (view) {
     cameraRef().position.y(-10, 8),
 
     chain(
-      waitFor(1),
-
-      fadeIn(titleRef(), 0.6),
-      waitFor(2),
-
-      // Pop in all three cards with stagger
-      all(
-        popIn(denseCardRef(), 2),
-        chain(waitFor(4), popIn(sparseCardRef(), 2)),
-        chain(waitFor(6), popIn(hybridCardRef(), 2))
-      ),
-      waitFor(2),
-
-      fadeIn(captionRef(), 2),
-      typeText(
-        captionTxt,
-        'Dense retrievers understand meaning; sparse retrievers match keywords; hybrid combines both for superior recall.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'Dense retrievers understand meaning; sparse retrievers match keywords; hybrid combines both for superior recall.', 8.88)
     )
   );
 });

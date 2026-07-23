@@ -28,7 +28,7 @@ export default makeScene2D('scene29', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-380} opacity={0}>
+        <Rect ref={titleRef} y={-380} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -39,7 +39,7 @@ export default makeScene2D('scene29', function* (view) {
         </Rect>
 
         {/* Subtitle */}
-        <Rect ref={subtitleRef} y={-300} opacity={0}>
+        <Rect ref={subtitleRef} y={-300} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={22}
@@ -55,7 +55,7 @@ export default makeScene2D('scene29', function* (view) {
             ref={trend1Ref}
             width={520}
             height={200}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.purple}
             showGlow={true}
           >
@@ -68,7 +68,7 @@ export default makeScene2D('scene29', function* (view) {
             ref={trend2Ref}
             width={480}
             height={180}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.cyan}
             showGlow={true}
           >
@@ -81,7 +81,7 @@ export default makeScene2D('scene29', function* (view) {
             ref={trend3Ref}
             width={480}
             height={180}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.success}
             showGlow={true}
           >
@@ -94,7 +94,7 @@ export default makeScene2D('scene29', function* (view) {
             ref={trend4Ref}
             width={480}
             height={180}
-            opacity={0}
+            opacity={1}
             glowColor={THEME.colors.warning}
             showGlow={true}
           >
@@ -110,7 +110,7 @@ export default makeScene2D('scene29', function* (view) {
           ref={captionRef}
           text={''}
           y={410}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -124,31 +124,7 @@ export default makeScene2D('scene29', function* (view) {
     cameraRef().position.y(-10, 8),
 
     chain(
-      waitFor(0.4),
-
-      fadeIn(titleRef(), 0.6),
-      fadeIn(subtitleRef(), 0.5),
-      waitFor(0.3),
-
-      // Zoom in trend cards
-      all(
-        zoomIn(trend1Ref(), 0.8, 0.6),
-        chain(waitFor(0.15), zoomIn(trend1Ref(), 0.8, 0.6)),
-        chain(waitFor(0.15), zoomIn(trend2Ref(), 0.8, 0.6)),
-        chain(waitFor(0.3), zoomIn(trend3Ref(), 0.8, 0.6)),
-        chain(waitFor(0.45), zoomIn(trend4Ref(), 0.8, 0.6))
-      ),
-      waitFor(0.4),
-
-
-      fadeIn(captionRef(), 0.5),
-      typeText(
-        captionTxt,
-        'The future of RAG includes agentic reasoning, multimodal retrieval, graph knowledge, and self-improving pipelines.',
-        2.8
-      ),
-
-      waitFor(15)
+      typeText(captionTxt, 'The future of RAG includes agentic reasoning, multimodal retrieval, graph knowledge, and self-improving pipelines.', 8.88)
     )
   );
 });

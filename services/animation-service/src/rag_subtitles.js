@@ -1,16 +1,23 @@
 export const ragSubtitlesList = [
   "Retrieval-Augmented Generation (RAG) is a technique that enhances LLMs with external data.",
+  "Who won the soccer world tournament in 2026?",
+  "FC Solar won the world tournament (Incorrect Fact!)",
   "When LLMs rely only on training data, they confidently hallucinate facts they do not know.",
   "LLMs are limited by a static knowledge cutoff date. They are blind to events after this point.",
   "In traditional systems, questions go directly to the model, which only knows what it learned in training.",
+  "RAG intercepts user queries, retrieves relevant facts from a database, and augments the prompt before generation.",
   "We chunk documents into smaller paragraphs to make sure RAG retrieves highly specific context.",
-  "Chunking breaks documents into manageable pieces. Semantic chunking preserves meaning; sliding windows preserve context.",
+  "An embedding model transforms text into high-dimensional vectors that capture semantic meaning.",
+  "Vector databases index these embeddings in high-dimensional spaces to find semantic connections instantly.",
+  "The query is vectorized, compared to indexed vectors, and the top-matching documents are retrieved.",
+  "We inject the retrieved context alongside the user question, packing them into an augmented prompt.",
+  "By connecting query embeddings directly to a vector database, RAG grounds the LLM in real-world facts.",
+  "Traditional databases match exact keywords. Vector databases find semantically similar content — even with different words.",
   "An embedding is a dense numerical vector that captures the semantic meaning of text in high-dimensional space.",
   "Two sentences with different words can produce nearly identical embeddings — because they mean the same thing.",
-  "Vector databases index these embeddings in high-dimensional spaces to find semantic connections instantly.",
-  "Traditional databases match exact keywords. Vector databases find semantically similar content — even with different words.",
   "Similarity search ranks candidate documents by how close their vector is to the query vector.",
   "Cosine similarity measures the angle between two vectors. A smaller angle means greater semantic similarity.",
+  "Chunking breaks documents into manageable pieces. Semantic chunking preserves meaning; sliding windows preserve context.",
   "Metadata tags each chunk with source, date, and topic — enabling pre-filtering before vector search.",
   "Dense retrievers understand meaning; sparse retrievers match keywords; hybrid combines both for superior recall.",
   "Dense retrieval captures meaning but is compute-heavy. Sparse retrieval is fast but keyword-bound. Use both together.",
@@ -22,5 +29,5 @@ export const ragSubtitlesList = [
   "RAG has real trade-offs: latency, chunking quality, context limits, and stale data must all be managed.",
   "RAG powers real-world apps across customer support, legal, healthcare, finance, enterprise search, and code assistance.",
   "The future of RAG includes agentic reasoning, multimodal retrieval, graph knowledge, and self-improving pipelines.",
-  "Retrieval-Augmented Generation processes and enhances language model accuracy."
+  "RAG: Documents → Embeddings → Vector DB → Retrieval → Augmented Prompt → Grounded LLM Answer. That concludes the complete guide to Retrieval-Augmented Generation."
 ];

@@ -1,7 +1,8 @@
 import { makeScene2D, Rect, Circle, Line, Txt, Node, colorSignal } from '@revideo/2d';
 import { all, sequence, waitFor, createRef, createSignal, fadeTransition } from '@revideo/core';
 import { colors, fonts, fontWeights, animationDurations, pointerStyle, nodeStyle, canvas, codeBlock } from '../styles/theme.js';
-import { generateCues } from '../utils/captions.js';
+import { cuesFromAlignment, groupCues } from '../utils/captions.js';
+import alignmentData from '../assets/alignment/Scene007-alignment.json';
 import { CodeBlock, createCodeBlockRefs, moveHighlight } from '../components/CodeBlock.js';
 
 export default makeScene2D('Scene007', function* (view) {
@@ -55,18 +56,12 @@ export default makeScene2D('Scene007', function* (view) {
   // Caption refs
   const captionContainer = createRef<Rect>();
   const captionText = createRef<Txt>();
+  const captionText2 = createRef<Txt>();
 
   // --- NARRATION ---
-  const beatAText = "Now let's talk about deleting nodes, and there are really three situations to think about. Deleting the head, deleting from the middle, and deleting the tail. Let's start with the head, since it's the simplest. To delete the head node, we save a temporary pointer to it, so we don't lose track of it in memory. Then, we move head forward, so it now points to the second node in the list. Finally, we delete the old head node, freeing up its memory. Just two steps, and we're done, in constant time.";
-  const beatBText = "Deleting from the middle or the tail works a bit differently, and honestly, they use the exact same logic, because remember, we don't have a separate tail pointer. To delete a node at some position, we first need to find the node right before it, just like we did with insertion. We traverse from head, counting our steps, until temp lands on the node just before the one we want to remove. Once we're there, we save a pointer to the node we're deleting, which is temp's next.";
   const beatCTextStr = "Then we update temp's next to skip over it, pointing instead to the node after the one being deleted. Finally, we delete that saved node to free its memory. If the node we're deleting happens to be the very last node, this same logic still works perfectly. Temp's next simply becomes nullptr after the update, correctly marking the new end of the list. That's the beauty of this approach, deleting from the middle and deleting the tail are actually the same operation.";
-  const beatDText = "And because we might need to traverse partway through the list to find the node before our target, both of these deletions take O of n time. Only deleting the head is a constant time operation, since we already know exactly where it is.";
 
-  const cuesA = generateCues(beatAText, 0, 22.8);
-  const cuesB = generateCues(beatBText, 22.8, 44.7 - 22.8);
-  const cuesC = generateCues(beatCTextStr, 44.7, 65.1 - 44.7);
-  const cuesD = generateCues(beatDText, 65.1, 76.3 - 65.1);
-  const allCues = [...cuesA, ...cuesB, ...cuesC, ...cuesD];
+  const allCues = groupCues(cuesFromAlignment(alignmentData));
 
   // --- CONTENT & DATA ---
   const codeString = `void deleteNode(Node*& head, int position) {
@@ -231,9 +226,8 @@ export default makeScene2D('Scene007', function* (view) {
         <Rect
           ref={captionContainer}
           layout
-          fill={`${colors.codeBlockBackground}CC`}
-          radius={nodeStyle.borderRadius}
-          opacity={0}
+          direction="column"
+          opacity={1}
           padding={[20, 40]}
           alignItems="center"
           justifyContent="center"
@@ -244,10 +238,28 @@ export default makeScene2D('Scene007', function* (view) {
             fill={colors.text}
             fontFamily={fonts.body}
             fontWeight={fontWeights.bodyWeight}
-            fontSize={36}
+            fontSize={28}
             textAlign="center"
             textWrap={true}
             maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+          />
+          <Txt
+            ref={captionText2}
+            text=""
+            fill={colors.text}
+            fontFamily={fonts.body}
+            fontWeight={fontWeights.bodyWeight}
+            fontSize={28}
+            textAlign="center"
+            textWrap={true}
+            maxWidth={canvas.width * 0.8}
+            shadowColor="rgba(0,0,0,0.8)"
+            shadowBlur={10}
+            shadowOffset={[0, 4]}
+            marginTop={10}
           />
         </Rect>
       </Node>
@@ -270,14 +282,26 @@ export default makeScene2D('Scene007', function* (view) {
     fadeTransition(1),
     // --- CAPTIONS THREAD ---
     (function* () {
+      let currentTime = 0;
+      yield* captionContainer().opacity(1, 0); 
+      
       for (const cue of allCues) {
-        const cueDuration = cue.end - cue.start;
-        const holdTime = Math.max(0, cueDuration - animationDurations.fadeIn * 2);
-        yield* captionText().text(cue.text, 0);
-        yield* captionContainer().opacity(1, animationDurations.fadeIn);
-        if (holdTime > 0) yield* waitFor(holdTime);
-        yield* captionContainer().opacity(0, animationDurations.fadeIn);
+        if (cue.start > currentTime) {
+          yield* all(captionText().text("", 0), captionText2().text("", 0));
+          yield* waitFor(cue.start - currentTime);
+          currentTime = cue.start;
+        }
+        
+        const lines = cue.text.split('\n');
+        yield* all(
+            captionText().text(lines[0] || "", 0),
+            captionText2().text(lines[1] || "", 0)
+        );
+        yield* waitFor(cue.end - cue.start);
+        currentTime = cue.end;
       }
+      yield* all(captionText().text("", 0), captionText2().text("", 0));
+      yield* captionContainer().opacity(0, 0);
     })(),
 
     // --- MAIN ANIMATION THREAD ---
@@ -291,7 +315,7 @@ export default makeScene2D('Scene007', function* (view) {
       yield* waitFor(1);
 
       // Beat A (0 - 22.8s)
-      const beatADuration = 22.8;
+      const beatADuration = 30.6;
       
       // Node 1 flashes red
       yield* pulseRed(node1A);
@@ -323,7 +347,7 @@ export default makeScene2D('Scene007', function* (view) {
       if (beatADuration - timeSpentA > 0) yield* waitFor(beatADuration - timeSpentA);
 
       // BEAT B (22.8 - 44.7s)
-      const beatBDuration = 44.7 - 22.8;
+      const beatBDuration = 59.96 - 30.6;
       
       // Transition: fade out Chain A, fade in Chain B
       yield* all(

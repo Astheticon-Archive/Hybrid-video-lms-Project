@@ -31,8 +31,7 @@ import scene29 from './scenes/scene29';
 import scene30 from './scenes/scene30';
 
 /**
- * RAG Educational Video Presentation
- * Registers 30 thematic stages of the RAG pipeline.
+ * Full 30-Scene RAG Educational Video Presentation
  */
 export default makeProject({
   scenes: [
@@ -40,14 +39,20 @@ export default makeProject({
     scene2,
     scene3,
     scene4,
+    scene5,
     scene6,
-    scene18,
+    scene7,
+    scene8,
+    scene9,
+    scene10,
+    scene11,
+    scene12,
+    scene13,
     scene14,
     scene15,
-    scene8,
-    scene13,
     scene16,
     scene17,
+    scene18,
     scene19,
     scene20,
     scene21,
@@ -59,8 +64,7 @@ export default makeProject({
     scene27,
     scene28,
     scene29,
-    scene12,
-
+    scene30,
   ],
   settings: {
     shared: {

@@ -33,7 +33,7 @@ export default makeScene2D('scene2', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-350} opacity={0}>
+        <Rect ref={titleRef} y={-350} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -50,7 +50,7 @@ export default makeScene2D('scene2', function* (view) {
           y={-100}
           width={350}
           height={180}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'USER QUERY'} color={THEME.colors.primary} marginBottom={10} />
           <Txt
@@ -77,7 +77,7 @@ export default makeScene2D('scene2', function* (view) {
           y={-100}
           width={300}
           height={180}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
         >
           <Badge text={'BASE LLM'} color={THEME.colors.purple} marginBottom={10} />
@@ -104,7 +104,7 @@ export default makeScene2D('scene2', function* (view) {
           y={-100}
           width={350}
           height={180}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.error}
         >
           <Badge text={'HALLUCINATED ANSWER'} color={THEME.colors.error} marginBottom={10} />
@@ -123,7 +123,7 @@ export default makeScene2D('scene2', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -139,44 +139,7 @@ export default makeScene2D('scene2', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Scene Title (placed at y=-350 for safety)
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop in Query Card and type search question
-      all(
-        popIn(userCardRef(), 2),
-        typeText(queryTextRef(), 'Who won the soccer world tournament in 2026?', 2.0)
-      ),
-      waitFor(2),
-
-      // Draw Arrow 1 to LLM and pop LLM Card
-      chain(
-        drawIn(arrow1Ref(), 2),
-        popIn(llmCardRef(), 2)
-      ),
-      waitFor(2),
-
-      // Draw Arrow 2 to Answer and pop Answer Card
-      chain(
-        drawIn(arrow2Ref(), 2),
-        all(
-          popIn(answerCardRef(), 2),
-          typeText(answerTextRef(), 'FC Solar won the world tournament (Incorrect Fact!)', 2.0)
-        )
-      ),
-      waitFor(2),
-
-      // Shake the answer card to show it is a hallucinated response
-      shakeNode(answerCardRef(), 20, 2),
-
-      // Fade in bottom caption explaining hallucination
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'When LLMs rely only on training data, they confidently hallucinate facts they do not know.', 2.5),
-
-      waitFor(15)
+      typeText(captionTxt, 'When LLMs rely only on training data, they confidently hallucinate facts they do not know.', 16.54)
     )
   );
 });

@@ -29,7 +29,7 @@ export default makeScene2D('scene4', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -46,7 +46,7 @@ export default makeScene2D('scene4', function* (view) {
           y={0}
           width={280}
           height={180}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'USER'} color={THEME.colors.primary} marginBottom={10} />
           <Txt
@@ -73,7 +73,7 @@ export default makeScene2D('scene4', function* (view) {
           y={0}
           width={280}
           height={180}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
         >
           <Badge text={'LLM'} color={THEME.colors.purple} marginBottom={10} />
@@ -101,7 +101,7 @@ export default makeScene2D('scene4', function* (view) {
           y={0}
           width={280}
           height={180}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.success}
         >
           <Badge text={'ANSWER'} color={THEME.colors.success} marginBottom={10} />
@@ -120,7 +120,7 @@ export default makeScene2D('scene4', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -136,37 +136,7 @@ export default makeScene2D('scene4', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop in User Card
-      popIn(userCardRef(), 2),
-      waitFor(2),
-
-      // Draw Arrow 1
-      drawIn(arrow1Ref(), 2),
-      waitFor(2),
-
-      // Pop in LLM Card
-      popIn(llmCardRef(), 2),
-      waitFor(2),
-
-      // Draw Arrow 2
-      drawIn(arrow2Ref(), 2),
-      waitFor(2),
-
-      // Pop in Answer Card
-      popIn(answerCardRef(), 2),
-      waitFor(2),
-
-      // Fade in Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'In traditional systems, questions go directly to the model, which only knows what it learned in training.', 2.8),
-
-      waitFor(15)
+      typeText(captionTxt, 'In traditional systems, questions go directly to the model, which only knows what it learned in training.', 7.94)
     )
   );
 });
