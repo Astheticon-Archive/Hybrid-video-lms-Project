@@ -13,7 +13,7 @@ const AUDIO_DIR = path.join(
 
 const OUTPUT_FILE = path.join(
     __dirname,
-    "src/"
+    "templates/rag/src/rag_durations_female.ts"
 );
 
 if (!fs.existsSync(AUDIO_DIR)) {

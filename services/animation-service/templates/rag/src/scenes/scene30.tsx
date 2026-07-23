@@ -182,7 +182,7 @@ export default makeScene2D('scene30', function* (view) {
     cameraRef().position.y(10, 8),
 
     chain(
-      typeText(captionTxt, 'RAG: Documents → Embeddings → Vector DB → Retrieval → Augmented Prompt → Grounded LLM Answer. That\', 8.93)
+      typeText(captionTxt, 'RAG: Documents → Embeddings → Vector DB → Retrieval → Augmented Prompt → Grounded LLM Answer.', 8.93)
     )
   );
 });
