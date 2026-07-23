@@ -3,206 +3,265 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Git Command Animation Player | Hybrid Video LMS</title>
+  <title>Hybrid Video LMS | AI Celebrity Course Video Engine</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- CSS Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Fullscreen cinematic layout centering the video player, no sidebars -->
-  <div class="cinema-theater">
-    
-    <div class="video-container" id="video-container">
-      
-      <!-- The Video Canvas (16:9 pure black screen) -->
-      <div class="video-canvas" id="video-canvas">
-        
-        <!-- 1. Intro Screen (Covers the whole canvas) -->
-        <div class="canvas-panel full-panel active" id="panel-intro">
-          <div class="intro-content">
-            <h1 class="gradient-text animate-glow-text">COMPLETE GIT INTERNALS</h1>
-            <p>15-Minute Cinematic Masterclass & Timeline visualizer</p>
-            <div class="intro-ring-glow"></div>
-          </div>
-        </div>
-
-        <!-- 2. Dual-Panel Interactive View (Side-by-Side to prevent overlapping) -->
-        <div class="canvas-panel split-panel" id="panel-split">
-          
-          <!-- Left Panel: Command Line Terminal -->
-          <div class="terminal-column">
-            <div class="mac-terminal">
-              <div class="terminal-header">
-                <div class="terminal-dots">
-                  <span class="dot red"></span>
-                  <span class="dot yellow"></span>
-                  <span class="dot green"></span>
-                </div>
-                <span class="terminal-title">git-bash.sh</span>
-              </div>
-              <div class="terminal-body" id="terminal-body">
-                <div class="terminal-line">
-                  <span class="prompt">$</span> <span id="terminal-input"></span>
-                </div>
-                <div class="terminal-output" id="terminal-output">
-                  <!-- shell logs -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Right Panel: Dynamic Visualizer (Swaps content based on active step) -->
-          <div class="visualizer-column">
-            
-            <!-- Dynamic Content Area A: File States (Staging/Working) -->
-            <div class="visual-subpanel" id="subpanel-files">
-              <div class="file-area working" id="working-area">
-                <div class="area-header"><i class="fa-solid fa-laptop-code"></i> Working Directory <span class="badge badge-danger">Untracked</span></div>
-                <div class="file-row" id="working-file-row"></div>
-              </div>
-              
-              <div class="staging-arrow">
-                <i class="fa-solid fa-angles-down animate-bounce-y"></i>
-                <span class="arrow-text">git add .</span>
-              </div>
-              
-              <div class="file-area staging" id="staging-area">
-                <div class="area-header"><i class="fa-solid fa-box-archive"></i> Staging Area <span class="badge badge-success">Staged</span></div>
-                <div class="file-row" id="staging-file-row"></div>
-              </div>
-            </div>
-
-            <!-- Dynamic Content Area B: Commit History Graph -->
-            <div class="visual-subpanel" id="subpanel-graph">
-              <div class="subpanel-title"><i class="fa-solid fa-database"></i> Local Repository Graph</div>
-              <div class="graph-box">
-                <svg id="canvas-commit-graph" class="graph-svg"></svg>
-              </div>
-              <div class="ref-pointers-bar" id="graph-pointers"></div>
-            </div>
-
-            <!-- Dynamic Content Area C: Local vs Remote Sync Graph -->
-            <div class="visual-subpanel" id="subpanel-remote">
-              <div class="remote-split-box">
-                <div class="remote-sub-area">
-                  <div class="subpanel-title"><i class="fa-solid fa-laptop"></i> Local Repository</div>
-                  <div class="mini-graph-box">
-                    <svg id="remote-local-graph" class="graph-svg"></svg>
-                  </div>
-                  <div class="ref-pointers-bar mini" id="remote-local-pointers"></div>
-                </div>
-                
-                <div class="remote-sync-arrow">
-                  <i class="fa-solid fa-arrows-left-right animate-pulse-x"></i>
-                </div>
-                
-                <div class="remote-sub-area">
-                  <div class="subpanel-title"><i class="fa-solid fa-cloud"></i> Remote (origin)</div>
-                  <div class="mini-graph-box">
-                    <svg id="remote-cloud-graph" class="graph-svg"></svg>
-                  </div>
-                  <div class="ref-pointers-bar mini" id="remote-cloud-pointers"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Dynamic Content Area D: File Diff Panel -->
-            <div class="visual-subpanel" id="subpanel-diff">
-              <div class="subpanel-title"><i class="fa-solid fa-code-compare"></i> File Changes (git diff)</div>
-              <div class="diff-viewer">
-                <div class="diff-file-header">diff --git a/index.html b/index.html</div>
-                <div class="diff-body">
-                  <div class="diff-line normal">@@ -5,8 +5,10 @@</div>
-                  <div class="diff-line normal"> &lt;body&gt;</div>
-                  <div class="diff-line del">-  &lt;h1&gt;Hello World&lt;/h1&gt;</div>
-                  <div class="diff-line add">+  &lt;h1&gt;Welcome to Git Masterclass&lt;/h1&gt;</div>
-                  <div class="diff-line add">+  &lt;p&gt;This visual walkthrough explains Git internals.&lt;/p&gt;</div>
-                  <div class="diff-line normal">   &lt;script src="app.js"&gt;&lt;/script&gt;</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Dynamic Content Area E: Stash Stack -->
-            <div class="visual-subpanel" id="subpanel-stash">
-              <div class="file-area working" id="stash-working-area">
-                <div class="area-header"><i class="fa-solid fa-laptop-code"></i> Working Directory</div>
-                <div class="file-row" id="stash-working-row"></div>
-              </div>
-              
-              <div class="stash-transition-zone">
-                <i class="fa-solid fa-right-left"></i>
-                <span class="arrow-text">git stash</span>
-              </div>
-              
-              <div class="file-area stash-chest" id="stash-stack-area">
-                <div class="area-header"><i class="fa-solid fa-vault"></i> Stash Stack <span class="badge badge-purple">stash@{0}</span></div>
-                <div class="file-row" id="stash-stack-row"></div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- 4. Subtitles Overlay (Bottom-Center) -->
-        <div class="video-subtitles" id="video-subtitles">
-          <p id="subtitles-p">Select Play to start the course...</p>
-        </div>
-
-      </div>
-
-      <!-- Video Controls Overlay -->
-      <div class="player-controls-overlay" id="player-controls">
-        
-        <!-- Video Seek Bar -->
-        <div class="progress-bar-container" id="seek-container">
-          <div class="progress-bar-bg"></div>
-          <div class="progress-bar-hover"></div>
-          <div class="progress-bar-fill" id="seek-fill"></div>
-          <div class="progress-bar-handle" id="seek-handle"></div>
-        </div>
-
-        <!-- Controls Toolbar -->
-        <div class="controls-toolbar">
-          <div class="controls-left">
-            <button class="player-btn" id="btn-play" title="Play (Space)"><i class="fa-solid fa-play"></i></button>
-            <button class="player-btn" id="btn-prev" title="Previous Step"><i class="fa-solid fa-backward-step"></i></button>
-            <button class="player-btn" id="btn-next" title="Next Step"><i class="fa-solid fa-forward-step"></i></button>
-            <div class="volume-control">
-              <button class="player-btn" id="btn-volume" title="Mute"><i class="fa-solid fa-volume-high"></i></button>
-              <div class="volume-slider-container">
-                <div class="volume-slider-fill" style="width: 80%"></div>
-              </div>
-            </div>
-            <span class="video-timer" id="video-timer">00:00 / 15:00</span>
-          </div>
-
-          <div class="controls-right">
-            <span class="chapter-indicator" id="chapter-indicator">INTRO</span>
-            <button class="player-btn" id="btn-loop" title="Toggle Loop"><i class="fa-solid fa-repeat"></i></button>
-            <button class="player-btn" id="btn-fullscreen" title="Fullscreen"><i class="fa-solid fa-expand"></i></button>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-
+  <div class="app-background">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
   </div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const jobId = urlParams.get('jobId');
-    if (jobId) {
-      document.write('<script src="/api/job/' + jobId + '/config.js"><\/script>');
-    }
-  </script>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">HYBRID VIDEO <span class="accent-text">LMS</span></span>
+          <span class="brand-sub">AI Celebrity Video Generator & CDN</span>
+        </div>
+      </div>
+
+      <div class="header-status">
+        <span class="status-badge online">
+          <span class="pulsing-dot"></span> CDN Service Active
+        </span>
+        <span class="status-badge api-mode">
+          <i class="fa-solid fa-shield-halved"></i> Auto-Fallback Enabled
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- 1. Generator Form View -->
+    <section id="section-form" class="view-section active">
+      
+      <div class="hero-header">
+        <h1 class="hero-title">Generate Animated Courses with <span class="gradient-text">AI Celebrity Voices</span></h1>
+        <p class="hero-subtitle">Select a course module and enter any celebrity narrator name. Powered by Sarvam TTS & instant pre-rendered CDN delivery.</p>
+      </div>
+
+      <form id="generator-form" onsubmit="handleFormSubmit(event)">
+
+        <!-- Course Selection Grid -->
+        <div class="section-label"><i class="fa-solid fa-graduation-cap"></i> 1. Select Course Module</div>
+        <div class="course-grid">
+          
+          <label class="course-card active" onclick="selectCourseCard(this, 'git')">
+            <input type="radio" name="course" value="git" checked hidden>
+            <div class="card-badge"><i class="fa-solid fa-code-branch"></i> Git</div>
+            <div class="card-icon"><i class="fa-solid fa-terminal"></i></div>
+            <h3 class="card-title">Git Command Internals</h3>
+            <p class="card-desc">15-minute interactive masterclass covering staging, commits, branches & remote sync.</p>
+            <div class="card-footer">
+              <span><i class="fa-regular fa-clock"></i> 15:00</span>
+              <span class="tag">Interactive</span>
+            </div>
+          </label>
+
+          <label class="course-card" onclick="selectCourseCard(this, 'rag')">
+            <input type="radio" name="course" value="rag" hidden>
+            <div class="card-badge purple"><i class="fa-solid fa-brain"></i> AI / LLM</div>
+            <div class="card-icon purple"><i class="fa-solid fa-network-wired"></i></div>
+            <h3 class="card-title">RAG Architecture</h3>
+            <p class="card-desc">30-Scene visual deep-dive into Chunking, Embeddings, Vector DBs & Augmented Prompts.</p>
+            <div class="card-footer">
+              <span><i class="fa-regular fa-clock"></i> 24 Scenes</span>
+              <span class="tag purple">Revideo 2D</span>
+            </div>
+          </label>
+
+          <label class="course-card" onclick="selectCourseCard(this, 'explainer')">
+            <input type="radio" name="course" value="explainer" hidden>
+            <div class="card-badge cyan"><i class="fa-solid fa-cubes"></i> Architecture</div>
+            <div class="card-icon cyan"><i class="fa-solid fa-layer-group"></i></div>
+            <h3 class="card-title">LMS Explainer</h3>
+            <p class="card-desc">System architecture overview, microservices workflow, and production deployment.</p>
+            <div class="card-footer">
+              <span><i class="fa-regular fa-clock"></i> 12:30</span>
+              <span class="tag cyan">Fullstack</span>
+            </div>
+          </label>
+
+          <label class="course-card" onclick="selectCourseCard(this, 'dsa')">
+            <input type="radio" name="course" value="dsa" hidden>
+            <div class="card-badge green"><i class="fa-solid fa-diagram-project"></i> DSA</div>
+            <div class="card-icon green"><i class="fa-solid fa-memory"></i></div>
+            <h3 class="card-title">Singly Linked List</h3>
+            <p class="card-desc">Algorithm animation visualizer covering node allocation, pointers, and traversal.</p>
+            <div class="card-footer">
+              <span><i class="fa-regular fa-clock"></i> 9 Scenes</span>
+              <span class="tag green">Algorithms</span>
+            </div>
+          </label>
+
+        </div>
+
+        <!-- Celebrity Voice Customization Panel -->
+        <div class="section-label" style="margin-top: 36px;"><i class="fa-solid fa-microphone-lines"></i> 2. Celebrity Narrator & Voice Customization</div>
+        <div class="glass-panel">
+          
+          <!-- Preset Celebrity Chips -->
+          <div class="form-group">
+            <label class="input-label">Popular Narrator Presets</label>
+            <div class="celeb-chips">
+              <button type="button" class="celeb-chip active" onclick="setPresetCeleb('Shahrukh Khan', 'male', this)">
+                <i class="fa-solid fa-user-tie"></i> Shahrukh Khan <span class="voice-tag">Aditya</span>
+              </button>
+              <button type="button" class="celeb-chip" onclick="setPresetCeleb('Deepika Padukone', 'female', this)">
+                <i class="fa-solid fa-user-ninja"></i> Deepika Padukone <span class="voice-tag">Shreya</span>
+              </button>
+              <button type="button" class="celeb-chip" onclick="setPresetCeleb('Prabhas', 'male', this)">
+                <i class="fa-solid fa-user-astronaut"></i> Prabhas <span class="voice-tag">Shubh</span>
+              </button>
+              <button type="button" class="celeb-chip" onclick="setPresetCeleb('Alia Bhatt', 'female', this)">
+                <i class="fa-solid fa-user-graduate"></i> Alia Bhatt <span class="voice-tag">Aruna</span>
+              </button>
+              <button type="button" class="celeb-chip" onclick="setPresetCeleb('NTR Jr', 'male', this)">
+                <i class="fa-solid fa-user-gear"></i> NTR Jr <span class="voice-tag">Shubh</span>
+              </button>
+              <button type="button" class="celeb-chip" onclick="setPresetCeleb('Amitabh Bachchan', 'male', this)">
+                <i class="fa-solid fa-user-shield"></i> Amitabh Bachchan <span class="voice-tag">Arvind</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-2">
+              <label for="celebrity-input" class="input-label">Celebrity Narrator Name</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-sparkles input-icon"></i>
+                <input type="text" id="celebrity-input" value="Shahrukh Khan" placeholder="e.g. Shahrukh Khan, Deepika, Prabhas..." required>
+              </div>
+            </div>
+
+            <div class="form-group flex-1">
+              <label for="gender-select" class="input-label">Voice Gender</label>
+              <div class="select-wrapper">
+                <i class="fa-solid fa-venus-mars select-icon"></i>
+                <select id="gender-select">
+                  <option value="auto" selected>Auto-detect (AI Classifier)</option>
+                  <option value="male">Male Voice</option>
+                  <option value="female">Female Voice</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-generate" class="primary-btn">
+            <span><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Course Video</span>
+          </button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+    <!-- 2. Progress / Rendering View -->
+    <section id="section-progress" class="view-section">
+      <div class="glass-panel progress-card">
+        <div class="spinner-container">
+          <div class="outer-ring"></div>
+          <div class="inner-ring"></div>
+          <i class="fa-solid fa-film spinner-icon"></i>
+        </div>
+
+        <h2 id="progress-title" class="progress-title">Generating Course Video...</h2>
+        <p id="progress-subtitle" class="progress-subtitle">Synthesizing audio and rendering layout frames</p>
+
+        <div class="progress-bar-wrapper">
+          <div class="progress-fill" id="progress-bar-fill" style="width: 0%"></div>
+        </div>
+
+        <div class="progress-metrics">
+          <span id="progress-pct" class="pct-text">0%</span>
+          <span id="progress-status-badge" class="badge-status">INITIALIZING</span>
+        </div>
+
+        <div class="steps-tracker">
+          <div class="step-item" id="step-audio"><i class="fa-solid fa-circle-notch"></i> Narration Audio</div>
+          <div class="step-item" id="step-frames"><i class="fa-solid fa-circle-notch"></i> Revideo Frames</div>
+          <div class="step-item" id="step-mux"><i class="fa-solid fa-circle-notch"></i> CDN Multiplexing</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Video Player & CDN Output View -->
+    <section id="section-player" class="view-section">
+      
+      <div class="player-header">
+        <div class="header-info">
+          <span class="badge-success-glow"><i class="fa-solid fa-circle-check"></i> Video Ready & Synchronized</span>
+          <h2 id="player-video-title" class="video-title">Git Command Internals - Shahrukh Khan Voice</h2>
+        </div>
+        <button type="button" class="secondary-btn" onclick="resetToForm()">
+          <i class="fa-solid fa-plus"></i> Generate Another Video
+        </button>
+      </div>
+
+      <!-- Embedded Custom Video Player Stage -->
+      <div class="video-stage">
+        <video id="main-video-element" class="video-element" controls preload="auto" playsinline>
+          <source id="video-source" src="" type="video/mp4">
+          Your browser does not support HTML5 video streaming.
+        </video>
+      </div>
+
+      <!-- CDN Specs & Action Toolbar -->
+      <div class="glass-panel cdn-panel">
+        
+        <div class="cdn-url-box">
+          <div class="url-label"><i class="fa-solid fa-link"></i> CDN Video Stream Endpoint</div>
+          <div class="url-input-group">
+            <input type="text" id="cdn-url-input" readonly value="">
+            <button type="button" class="copy-btn" onclick="copyCdnUrl()">
+              <i class="fa-regular fa-copy"></i> Copy CDN URL
+            </button>
+          </div>
+        </div>
+
+        <div class="cdn-actions">
+          <a id="download-btn" href="#" download class="primary-btn download-btn">
+            <i class="fa-solid fa-download"></i> Download MP4 Video
+          </a>
+          <button type="button" class="secondary-btn" onclick="openRawVideo()">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Stream in New Tab
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Error Alert Container -->
+    <div id="error-toast" class="error-toast">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span id="error-toast-msg">An unexpected error occurred.</span>
+      <button onclick="dismissError()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Copy Toast Alert -->
+    <div id="copy-toast" class="copy-toast">
+      <i class="fa-solid fa-check"></i> CDN Video URL copied to clipboard!
+    </div>
+
+  </main>
+
   <script src="script.js"></script>
 </body>
 </html>

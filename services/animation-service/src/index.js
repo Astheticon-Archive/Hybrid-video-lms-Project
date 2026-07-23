@@ -24,9 +24,67 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve testing sandbox as the default homepage
+// Serve modern LMS player homepage
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/test.html'));
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+// CDN Video Streaming Helper with HTTP Range Byte Support
+function streamVideoFile(filePath, req, res) {
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'Video asset not found' });
+  }
+
+  const stat = fs.statSync(filePath);
+  const fileSize = stat.size;
+  const range = req.headers.range;
+
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range');
+  res.setHeader('Accept-Ranges', 'bytes');
+  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+
+    if (start >= fileSize || end >= fileSize) {
+      res.setHeader('Content-Range', `bytes */${fileSize}`);
+      return res.status(416).send('Requested Range Not Satisfiable');
+    }
+
+    const chunksize = (end - start) + 1;
+    const file = fs.createReadStream(filePath, { start, end });
+
+    res.writeHead(206, {
+      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+      'Accept-Ranges': 'bytes',
+      'Content-Length': chunksize,
+      'Content-Type': 'video/mp4',
+    });
+
+    file.pipe(res);
+  } else {
+    res.writeHead(200, {
+      'Content-Length': fileSize,
+      'Content-Type': 'video/mp4',
+    });
+
+    fs.createReadStream(filePath).pipe(res);
+  }
+}
+
+// CDN Video Streaming route with HTTP Range byte support for seeking
+app.get('/outputs/:filename', (req, res) => {
+  const filePath = path.join(__dirname, '../public/outputs', req.params.filename);
+  streamVideoFile(filePath, req, res);
+});
+
+app.get('/api/v1/cdn/stream/:filename', (req, res) => {
+  const filePath = path.join(__dirname, '../public/outputs', req.params.filename);
+  streamVideoFile(filePath, req, res);
 });
 
 app.use(express.static(path.join(__dirname, '../public')));
