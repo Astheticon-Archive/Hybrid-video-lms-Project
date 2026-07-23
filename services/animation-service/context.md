@@ -33,6 +33,4 @@ for deciding what voice  model to choose u can use openrouter any free model to 
 
 openrouter api=OPENROUTER_API_KEY_ENV
 
-
-
 start coding the goal is get a completed api that gives videos all the best!

@@ -95,14 +95,13 @@ const jobsDb = new Map();
 // Sarvam API Key Pool for automatic rotation
 const SARVAM_KEYS = [
   process.env.SARVAM_API_KEY,
-  "SARVAM_API_KEY_ENV_1",
-  "SARVAM_API_KEY_ENV_2",
-  "SARVAM_API_KEY_ENV_3",
-  "SARVAM_API_KEY_ENV_4"
+  process.env.SARVAM_API_KEY_2,
+  process.env.SARVAM_API_KEY_3,
+  process.env.SARVAM_API_KEY_4
 ].filter(Boolean);
 
 // OpenRouter API Key for AI-driven celebrity gender detection
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || "OPENROUTER_API_KEY_ENV";
+const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
 
 const celebrityVoiceMap = {
   // Male voices (Fallback Male 1: aditya, Fallback Male 2: shubh)
