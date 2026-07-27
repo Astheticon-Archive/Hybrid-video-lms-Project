@@ -35,7 +35,7 @@ export default makeScene2D('scene5', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -52,7 +52,7 @@ export default makeScene2D('scene5', function* (view) {
           y={-180}
           width={240}
           height={140}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'USER'} color={THEME.colors.primary} marginBottom={6} />
           <Txt fontFamily={THEME.fonts.main} fontSize={18} fill={THEME.colors.text} text={'Submits Query'} />
@@ -65,7 +65,7 @@ export default makeScene2D('scene5', function* (view) {
           y={-180}
           width={240}
           height={140}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.cyan}
         >
           <Badge text={'RETRIEVER'} color={THEME.colors.cyan} marginBottom={6} />
@@ -77,7 +77,7 @@ export default makeScene2D('scene5', function* (view) {
           ref={dbRef}
           x={-260}
           y={150}
-          opacity={0}
+          opacity={1}
         />
 
         {/* Prompt Box */}
@@ -85,7 +85,7 @@ export default makeScene2D('scene5', function* (view) {
           ref={promptRef}
           x={220}
           y={0}
-          opacity={0}
+          opacity={1}
           scale={0.9}
         />
 
@@ -96,7 +96,7 @@ export default makeScene2D('scene5', function* (view) {
           y={0}
           width={240}
           height={160}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.purple}
         >
           <Badge text={'LLM'} color={THEME.colors.purple} marginBottom={6} />
@@ -133,7 +133,7 @@ export default makeScene2D('scene5', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -149,48 +149,7 @@ export default makeScene2D('scene5', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop in User and Retriever
-      all(
-        popIn(userCardRef(), 2),
-        popIn(retrieverCardRef(), 2)
-      ),
-
-      // Draw User -> Retriever
-      drawIn(arrowUserToRetrieverRef(), 2),
-      waitFor(2),
-
-      // Pop DB and connect Retriever -> DB
-      all(
-        popIn(dbRef(), 2),
-        drawIn(arrowRetrieverToDbRef(), 2)
-      ),
-      waitFor(2),
-
-      // Pop Prompt Box and connect DB -> Prompt
-      all(
-        popIn(promptRef(), 2),
-        drawIn(arrowDbToPromptRef(), 2)
-      ),
-      waitFor(2),
-
-      // Pop LLM and connect Prompt -> LLM
-      all(
-        popIn(llmCardRef(), 2),
-        drawIn(arrowPromptToLlmRef(), 2)
-      ),
-      waitFor(2),
-
-      // Fade in Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'RAG intercepts user queries, retrieves relevant facts from a database, and augments the prompt before generation.', 2.8),
-
-      waitFor(5)
+      typeText(captionTxt, 'RAG intercepts user queries, retrieves relevant facts from a database, and augments the prompt before generation.', 8.57)
     )
   );
 });

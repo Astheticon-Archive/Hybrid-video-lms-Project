@@ -30,7 +30,7 @@ export default makeScene2D('scene7', function* (view) {
       <Rect ref={cameraRef} size={['100%', '100%']} justifyContent={'center'} alignItems={'center'}>
 
         {/* Title */}
-        <Rect ref={titleRef} y={-400} opacity={0}>
+        <Rect ref={titleRef} y={-400} opacity={1}>
           <Txt
             fontFamily={THEME.fonts.main}
             fontSize={48}
@@ -47,7 +47,7 @@ export default makeScene2D('scene7', function* (view) {
           y={0}
           width={300}
           height={180}
-          opacity={0}
+          opacity={1}
         >
           <Badge text={'TEXT CHUNK'} color={THEME.colors.primary} marginBottom={10} />
           <Txt
@@ -74,7 +74,7 @@ export default makeScene2D('scene7', function* (view) {
           y={0}
           width={300}
           height={180}
-          opacity={0}
+          opacity={1}
           glowColor={THEME.colors.primary}
         >
           <Badge text={'EMBEDDING MODEL'} color={THEME.colors.primary} marginBottom={10} />
@@ -100,7 +100,7 @@ export default makeScene2D('scene7', function* (view) {
           ref={vectorRef}
           x={450}
           y={0}
-          opacity={0}
+          opacity={1}
           values={[0.82, -0.41, 0.09, 0.95, -0.73, 0.36]}
           glow={true}
         />
@@ -110,7 +110,7 @@ export default makeScene2D('scene7', function* (view) {
           ref={captionRef}
           text={''}
           y={350}
-          opacity={0}
+          opacity={1}
         />
 
       </Rect>
@@ -126,37 +126,7 @@ export default makeScene2D('scene7', function* (view) {
 
     // Scene animation sequence
     chain(
-      waitFor(1),
-
-      // Fade in Title
-      fadeIn(titleRef(), 2),
-      waitFor(2),
-
-      // Pop Chunk Card
-      popIn(chunkCardRef(), 2),
-      waitFor(2),
-
-      // Draw Arrow 1
-      drawIn(arrow1Ref(), 2),
-      waitFor(2),
-
-      // Pop Embedding Model
-      popIn(modelCardRef(), 2),
-      waitFor(2),
-
-      // Draw Arrow 2
-      drawIn(arrow2Ref(), 2),
-      waitFor(2),
-
-      // Pop Vector Card
-      popIn(vectorRef(), 2),
-      waitFor(2),
-
-      // Fade in Caption
-      fadeIn(captionRef(), 2),
-      typeText(captionTxt, 'An embedding model transforms text into high-dimensional vectors that capture semantic meaning.', 2.8),
-
-      waitFor(5)
+      typeText(captionTxt, 'An embedding model transforms text into high-dimensional vectors that capture semantic meaning.', 7.42)
     )
   );
 });
