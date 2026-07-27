@@ -101,7 +101,7 @@ const SARVAM_KEYS = [
 ].filter(Boolean);
 
 // OpenRouter API Key for AI-driven celebrity gender detection
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
+const getOpenRouterKey = () => process.env.OPENROUTER_API_KEY || process.env.openrouter_Api_Key || process.env.OPENROUTER_KEY || process.env.openrouter_api_key;
 
 const celebrityVoiceMap = {
   // Male voices (Fallback Male 1: aditya, Fallback Male 2: shubh)
@@ -141,14 +141,21 @@ const celebrityVoiceMap = {
 // OpenRouter AI Gender Classifier
 async function detectGenderWithOpenRouter(celebrityName) {
   if (!celebrityName) return null;
+  const apiKey = getOpenRouterKey();
+  if (!apiKey) {
+    console.warn("[OpenRouter AI] No OpenRouter API key found in environment (OPENROUTER_API_KEY / openrouter_Api_Key).");
+    return null;
+  }
+
   try {
+    console.log(`\x1b[36m[OpenRouter AI]\x1b[0m Querying OpenRouter AI for gender of celebrity: '${celebrityName}'...`);
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 4000);
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENROUTER_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -167,8 +174,17 @@ async function detectGenderWithOpenRouter(celebrityName) {
     if (response.ok) {
       const data = await response.json();
       const text = data.choices?.[0]?.message?.content?.trim()?.toLowerCase();
-      if (text?.includes('female')) return 'female';
-      if (text?.includes('male')) return 'male';
+      if (text?.includes('female')) {
+        console.log(`\x1b[32m[OpenRouter AI Success]\x1b[0m Detected '${celebrityName}' -> female`);
+        return 'female';
+      }
+      if (text?.includes('male')) {
+        console.log(`\x1b[32m[OpenRouter AI Success]\x1b[0m Detected '${celebrityName}' -> male`);
+        return 'male';
+      }
+    } else {
+      const errText = await response.text();
+      console.warn(`[OpenRouter AI] Query returned HTTP ${response.status}: ${errText}`);
     }
   } catch (err) {
     console.warn(`[OpenRouter AI] Gender detection query failed: ${err.message}. Falling back to local lookup.`);
@@ -176,12 +192,106 @@ async function detectGenderWithOpenRouter(celebrityName) {
   return null;
 }
 
+// Smart Offline Gender Detection Heuristic
+function detectGenderHeuristic(name, explicitGender) {
+  if (explicitGender === 'male' || explicitGender === 'female') {
+    return explicitGender;
+  }
+
+  if (!name) return 'male';
+
+  const norm = name.toLowerCase().trim();
+  const clean = norm.replace(/[^a-z]/g, '');
+
+  // 1. Direct Map Check
+  if (celebrityVoiceMap[clean]) {
+    return celebrityVoiceMap[clean].gender;
+  }
+  for (const key of Object.keys(celebrityVoiceMap)) {
+    if (clean.includes(key) || key.includes(clean)) {
+      return celebrityVoiceMap[key].gender;
+    }
+  }
+
+  // 2. Comprehensive Known Female Names & Keywords
+  const femaleNames = [
+    'deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika',
+    'nayanthara', 'aruna', 'shreya', 'kiara', 'samantha', 'kriti', 'anushka', 'tabu', 'kajol',
+    'taapsee', 'trisha', 'tamannaah', 'tamanna', 'disha', 'jacqueline', 'shruti', 'nushrratt',
+    'janhvi', 'sara', 'ananya', 'suhana', 'sonam', 'sonakshi', 'vibhuti', 'pooja', 'aditi',
+    'radhika', 'yami', 'bhumi', 'mrunal', 'huma', 'vidya', 'shilpa', 'karisma', 'juhi',
+    'raveena', 'sridevi', 'rekha', 'hema', 'jaya', 'nargis', 'waheeda', 'asha', 'lata',
+    'sunidhi', 'neha', 'monali', 'kanika', 'jonita', 'palak', 'dhvani', 'niti', 'taylor',
+    'beyonce', 'rihanna', 'ariana', 'selena', 'billie', 'dua', 'katy', 'adele', 'madonna',
+    'britney', 'shakira', 'jennifer', 'scarlett', 'emma', 'margot', 'gal', 'anne', 'natalie',
+    'keira', 'charlize', 'penelope', 'salma', 'zendaya', 'florence', 'ana', 'elizabeth', 'rose',
+    'kate', 'angelina', 'megan', 'amber', 'kirsten', 'cameron', 'winona', 'drew', 'sandra',
+    'meryl', 'cate', 'nicole', 'reese', 'jessica', 'rachel', 'amanda', 'violet', 'sophie',
+    'olivia', 'mia', 'chloe', 'zoe', 'lily', 'grace', 'hannah', 'ella', 'emily', 'charlotte',
+    'harper', 'evelyn', 'abigail', 'avery', 'sofia', 'sophia', 'victoria', 'camila', 'aria',
+    'scarlet', 'layla', 'zoey', 'nora', 'hazel', 'eleanor', 'aurora', 'natalia', 'naomi',
+    'alyssa', 'alison', 'ashley', 'brittany', 'courtney', 'heather', 'lindsay', 'morgan',
+    'paige', 'shelby', 'sydney', 'vanessa', 'whitney', 'alexandra', 'andrea', 'angelica',
+    'angela', 'anita', 'ann', 'anna', 'audrey', 'barbara', 'carol', 'caroline', 'catherine',
+    'christina', 'christine', 'clara', 'cynthia', 'diana', 'donna', 'dorothy', 'eva', 'fiona',
+    'frances', 'helen', 'irene', 'jane', 'janet', 'jean', 'joan', 'joyce', 'judith', 'judy',
+    'julia', 'julie', 'karen', 'katherine', 'kathleen', 'laura', 'linda', 'lisa', 'louise',
+    'lucy', 'margaret', 'maria', 'marie', 'marilyn', 'martha', 'mary', 'michelle', 'nancy',
+    'pamela', 'patricia', 'paula', 'rebecca', 'rita', 'ruth', 'sarah', 'sharon', 'shirley',
+    'stephanie', 'susan', 'theresa', 'teresa', 'valerie', 'virginia', 'wendy', 'female',
+    'woman', 'lady', 'girl', 'queen', 'actress'
+  ];
+
+  if (femaleNames.some(fn => norm.includes(fn) || clean.includes(fn))) {
+    return 'female';
+  }
+
+  // 3. Known Male Names & Keywords
+  const maleNames = [
+    'shahrukh', 'srk', 'sharukh', 'salman', 'aamir', 'akshay', 'hrithik', 'ranbir', 'ranveer',
+    'ajay', 'sunny', 'bobby', 'sanjay', 'saif', 'shahid', 'varun', 'sidharth', 'siddharth',
+    'kartik', 'ayushmann', 'vicky', 'rajkummar', 'nawazuddin', 'pankaj', 'manoj', 'irrfan',
+    'anupam', 'paresh', 'boman', 'suniel', 'jackie', 'govinda', 'mithun', 'dharmendra',
+    'amitabh', 'bachchan', 'rajinikanth', 'kamal', 'vijay', 'ajith', 'suriya', 'vikram',
+    'dhanush', 'yash', 'puneeth', 'darshan', 'sudeep', 'upendra', 'ram', 'ntr', 'prabhas',
+    'mahesh', 'allu', 'arjun', 'nani', 'deverakonda', 'ravi', 'teja', 'nagarjuna', 'venkatesh',
+    'chiranjeevi', 'kalyan', 'pawan', 'rana', 'gopichand', 'dulquer', 'fahadh', 'nivin',
+    'tovino', 'prithviraj', 'mammootty', 'mohanlal', 'tom', 'brad', 'leonardo', 'robert',
+    'chris', 'harrison', 'morgan', 'keanu', 'johnny', 'will', 'dwayne', 'rock', 'vin',
+    'ryan', 'hugh', 'christian', 'matt', 'ben', 'mark', 'steve', 'michael', 'david',
+    'james', 'john', 'paul', 'peter', 'daniel', 'sam', 'jack', 'harry', 'charlie',
+    'george', 'oliver', 'william', 'henry', 'thomas', 'edward', 'joseph', 'charles',
+    'richard', 'arthur', 'louis', 'freddie', 'alexander', 'sebastian', 'adam', 'benjamin',
+    'luke', 'matthew', 'nathan', 'samuel', 'ethan', 'andrew', 'christopher', 'joshua',
+    'aaron', 'dylan', 'ezra', 'gabriel', 'isaac', 'julian', 'leo', 'logan', 'lucas',
+    'mason', 'noah', 'owen', 'theodore', 'wyatt', 'male', 'man', 'guy', 'boy', 'king', 'actor'
+  ];
+
+  if (maleNames.some(mn => norm.includes(mn) || clean.includes(mn))) {
+    return 'male';
+  }
+
+  // 4. Common Female Suffixes
+  const femaleSuffixes = ['a', 'i', 'ee', 'ie', 'ya', 'ina', 'ika', 'ita', 'isha', 'iti', 'ine', 'ette', 'ica', 'iya'];
+  const firstName = clean.split(' ')[0] || clean;
+  if (femaleSuffixes.some(suf => firstName.endsWith(suf))) {
+    const maleSuffixExceptions = ['rama', 'krishna', 'surya', 'bala', 'rana', 'mustafa', 'mufasa', 'obama', 'baba', 'nana', 'dada'];
+    if (!maleSuffixExceptions.some(ex => firstName.includes(ex))) {
+      return 'female';
+    }
+  }
+
+  return 'male';
+}
+
 function getCelebrityVoice(name, gender) {
   const defaultMale = { speaker: 'aditya', language_code: 'en-IN', gender: 'male' };
   const defaultFemale = { speaker: 'shreya', language_code: 'en-IN', gender: 'female' };
 
+  const effectiveGender = (gender && gender !== 'auto') ? gender : detectGenderHeuristic(name);
+
   if (!name) {
-    return gender === 'female' ? defaultFemale : defaultMale;
+    return effectiveGender === 'female' ? defaultFemale : defaultMale;
   }
 
   const normalized = name.toLowerCase().trim().replace(/[^a-z]/g, '');
@@ -194,13 +304,7 @@ function getCelebrityVoice(name, gender) {
     }
   }
 
-  if (gender === 'female') {
-    return defaultFemale;
-  }
-
-  const femaleKeywords = ['deepika', 'priyanka', 'katrina', 'alia', 'madhuri', 'kareena', 'shraddha', 'rashmika', 'nayanthara', 'female', 'aruna', 'lady', 'woman'];
-  const isFemale = femaleKeywords.some(item => normalized.includes(item));
-  if (isFemale) {
+  if (effectiveGender === 'female') {
     return defaultFemale;
   }
 
@@ -553,14 +657,13 @@ app.post('/api/v1/course/generate', async (req, res) => {
 
   const courseKey = normalizeCourseName(course);
 
-  // Determine gender dynamically: 1) Body override, 2) OpenRouter AI, 3) Local heuristic
-  let targetGender = gender;
-  if (!targetGender || (targetGender !== 'male' && targetGender !== 'female')) {
+  // Determine gender dynamically: 1) Body override, 2) OpenRouter AI, 3) Robust local heuristic
+  let targetGender = (gender && gender !== 'auto') ? gender : null;
+  if (!targetGender) {
     targetGender = await detectGenderWithOpenRouter(celebrity);
   }
-  if (!targetGender) {
-    const voiceInfo = getCelebrityVoice(celebrity, null);
-    targetGender = voiceInfo.gender || 'male';
+  if (!targetGender || (targetGender !== 'male' && targetGender !== 'female')) {
+    targetGender = detectGenderHeuristic(celebrity);
   }
 
   const voice = getCelebrityVoice(celebrity, targetGender);

@@ -12,13 +12,30 @@ scripts/
   align_audio.py          ← Produces word-level alignment JSON from audio + transcript
   render-all.js           ← Orchestrates the full render pipeline (all scenes → final MP4)
   render-single.js        ← Isolated per-scene renderer (spawned as a child process)
+  setup-cache.js          ← Generates pre-rendered cache videos for instant API playback
+  cache-health.js         ← Verifies all cache files are present
 
 src/
+  index.js                ← Express API server with cache-first video serving
   scenes/                 ← Scene001.tsx … Scene009.tsx  (Revideo animation scenes)
   utils/
     captions.ts           ← Caption cue parsing: cuesFromAlignment() + groupCues()
   assets/
     alignment/            ← Scene00X-alignment.json  (word-level timing data)
+
+api/
+  index.js                ← Vercel Serverless Function (CDN-backed cache serving)
+
+public/
+  outputs/                ← Pre-rendered cache video files (tracked in git)
+    video_git_male.mp4
+    video_git_female.mp4
+    video_rag_male.mp4
+    video_rag_female.mp4
+    video_dsa_male.mp4
+    video_dsa_female.mp4
+    video_explainer_male.mp4
+    video_explainer_female.mp4
 
 render-output/
   raw/                    ← Intermediate per-scene MP4s
@@ -29,7 +46,86 @@ final-hybrid-video.mp4    ← Fully stitched final output
 
 ---
 
-## Setup Instructions
+## 🚀 Quick Start (Zero Dependencies)
+
+The easiest way to get started is with the **pre-rendered cache system**. The repo includes 8 pre-rendered course videos (4 courses × 2 voice genders) that are tracked in git and served instantly by the API — no API keys, ffmpeg, or browser automation needed.
+
+### 1. Install & start
+```bash
+cd services/animation-service
+npm install        # Runs postinstall cache health check automatically
+npm start          # Starts server on port 3000
+```
+
+### 2. Make an API call
+```bash
+# Get a Git course video with a female voice (instant - served from cache)
+curl -X POST http://localhost:3000/api/v1/course/generate \
+  -H "Content-Type: application/json" \
+  -d '{"course": "git", "celebrity": "deepika", "gender": "female"}'
+
+# Available courses: git, rag, dsa, explainer
+# Available genders: male, female
+# Celebrity name is used for voice selection but cache serves any → same gender
+```
+
+> **No API keys required!** The cache videos are already in the repo.
+> The response is returned in **under 500ms** since the video is pre-rendered.
+
+Open [http://localhost:3000](http://localhost:3000) to use the built-in web sandbox UI.
+
+---
+
+## 📦 Cache System
+
+### How it works
+
+1. **Pre-rendered cache**: 8 video files (`video_{course}_{gender}.mp4`) are tracked in git under `public/outputs/`.
+2. **Cache-first API**: When you POST to `/api/v1/course/generate`, the server checks if a matching cache file exists.
+3. **Instant response**: If found, it copies the file and returns `{ status: 'completed' }` immediately.
+4. **Fallback rendering**: If no cache exists (e.g., new course), it runs the full rendering pipeline.
+
+### Cache files included
+
+| Course     | Male (size) | Female (size) |
+|------------|-------------|---------------|
+| Git        | 11 MB       | 11 MB         |
+| RAG        | 82 MB       | 82 MB         |
+| DSA        | 65 MB       | 63 MB         |
+| Explainer  | 21 MB       | 10 MB         |
+
+**Total: ~345 MB** — a small price for instant-first-load on fresh clones.
+
+### Scripts
+
+```bash
+# Verify all cache files are present (auto-runs on npm install)
+npm run cache-health
+
+# Regenerate cache files (requires Sarvam API key + ffmpeg + Playwright)
+npm run setup-cache
+
+# Force-regenerate all cache files
+npm run setup-cache -- --force
+```
+
+### Adding new cache files
+
+```bash
+# 1. Generate the video via the API
+curl -X POST http://localhost:3000/api/v1/course/generate \
+  -H "Content-Type: application/json" \
+  -d '{"course": "rag", "celebrity": "shahrukh", "gender": "male"}'
+
+# 2. The server auto-saves it to public/outputs/video_rag_male.mp4
+# 3. Update .gitignore if needed (add !negation pattern)
+# 4. Force-add to git
+# 5. Commit
+```
+
+---
+
+## Full Setup (Development with Live Rendering)
 
 ### Prerequisites
 - Node.js 20.x
@@ -48,7 +144,7 @@ npm install
 Create a `.env` file or export variables in your shell:
 
 ```bash
-# Required: Sarvam AI API key for TTS audio generation
+# Required for live TTS audio generation (not needed for cache)
 export SARVAM_API_KEY=your_key_here   # Linux/macOS
 set SARVAM_API_KEY=your_key_here      # Windows
 ```
