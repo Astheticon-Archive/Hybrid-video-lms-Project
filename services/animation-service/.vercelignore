@@ -4,7 +4,6 @@ src/utils
 src/assets
 src/styles
 src/project.ts
-scripts
 templates
 Dockerfile
 *.md
