@@ -1,8 +1,16 @@
-from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, HTTPException
-from pydantic import BaseModel
 import uuid
-from typing import Dict, Optional
+from typing import Dict, Any, Optional
 from datetime import datetime
+from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, status
+from src.config import SUPPORTED_MODELS
+from src.schemas import GenerateAvatarResponse, JobStatusResponse
+from src.validation import validate_model, validate_image_file, validate_audio_file
+from src.storage import save_job_inputs
+from src.pipeline import run_talking_head_pipeline
+from src.exceptions import register_exception_handlers, JobNotFoundError
+from src.logging_config import get_logger
+
+logger = get_logger("main")
 
 app = FastAPI(
     title="AI Talking Head Service",
@@ -10,60 +18,82 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Register custom exception handlers for consistent JSON errors & logging
+register_exception_handlers(app)
+
 # In-memory job state store
-jobs_db: Dict[str, dict] = {}
-
-class JobStatusResponse(BaseModel):
-    job_id: str
-    status: str
-    progress: float
-    estimated_time_remaining: float
-    created_at: str
-    completed_at: Optional[str] = None
-    output_url: Optional[str] = None
-
-def dummy_rendering_task(job_id: str):
-    # This is a placeholder task simulation
-    jobs_db[job_id]["status"] = "rendering"
-    jobs_db[job_id]["progress"] = 50.0
+jobs_db: Dict[str, Dict[str, Any]] = {}
 
 @app.get("/")
 def read_root():
+    logger.info("Health check endpoint 'GET /' called.")
     return {"name": "AI Talking Head Service", "status": "healthy"}
 
-@app.post("/api/v1/avatar/generate", status_code=202)
-def generate_avatar(
+@app.post("/api/v1/avatar/generate", response_model=GenerateAvatarResponse, status_code=status.HTTP_202_ACCEPTED)
+async def generate_avatar(
     background_tasks: BackgroundTasks,
     face_image: UploadFile = File(...),
     audio: UploadFile = File(...),
     model: str = Form("latentsync"),
     enhancer: bool = Form(True)
 ):
+    logger.info(f"Received avatar generation request: image='{face_image.filename if face_image else None}', audio='{audio.filename if audio else None}', model='{model}', enhancer={enhancer}")
+
+    # Step 1: Request parameter validation
+    validated_model = validate_model(model)
+    img_bytes = await validate_image_file(face_image)
+    audio_bytes = await validate_audio_file(audio)
+
+    # Step 2: Generate unique job ID & timestamp
     job_id = f"job_{uuid.uuid4().hex[:12]}"
-    
-    # Store initial state
+    created_at = datetime.utcnow().isoformat() + "Z"
+
+    # Step 3: Safe file persistence before request completes
+    saved_paths = save_job_inputs(
+        job_id=job_id,
+        image_filename=face_image.filename or "face.jpg",
+        image_bytes=img_bytes,
+        audio_filename=audio.filename or "voice.wav",
+        audio_bytes=audio_bytes
+    )
+
+    # Step 4: Record initial job state in jobs_db
     jobs_db[job_id] = {
         "job_id": job_id,
         "status": "queued",
         "progress": 0.0,
         "estimated_time_remaining": 30.0,
-        "created_at": datetime.utcnow().isoformat() + "Z",
+        "created_at": created_at,
         "completed_at": None,
-        "output_url": None
+        "output_url": None,
+        "error_message": None
     }
-    
-    # Trigger background work simulation
-    background_tasks.add_task(dummy_rendering_task, job_id)
-    
-    return {
-        "job_id": job_id,
-        "status": "queued",
-        "created_at": jobs_db[job_id]["created_at"],
-        "message": "Avatar rendering job successfully queued."
-    }
+
+    # Step 5: Dispatch background task passing saved file paths (never UploadFile objects)
+    background_tasks.add_task(
+        run_talking_head_pipeline,
+        job_id,
+        saved_paths["image_path"],
+        saved_paths["audio_path"],
+        validated_model,
+        enhancer,
+        jobs_db
+    )
+
+    logger.info(f"Successfully queued job {job_id}")
+
+    return GenerateAvatarResponse(
+        job_id=job_id,
+        status="queued",
+        created_at=created_at,
+        message="Avatar rendering job successfully queued."
+    )
 
 @app.get("/api/v1/avatar/jobs/{job_id}", response_model=JobStatusResponse)
 def get_job_status(job_id: str):
+    logger.info(f"Querying job status for job_id='{job_id}'")
     if job_id not in jobs_db:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return jobs_db[job_id]
+        logger.warning(f"Job status query failed: job '{job_id}' not found.")
+        raise JobNotFoundError(job_id)
+    
+    return JobStatusResponse(**jobs_db[job_id])
