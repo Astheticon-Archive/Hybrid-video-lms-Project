@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 # Base directory for the talking head service
@@ -23,7 +22,7 @@ ALLOWED_AUDIO_MIME_TYPES = {
     "audio/ogg",
     "audio/flac",
     "audio/x-m4a",
-    "audio/m4a"
+    "audio/m4a",
 }
 
 # Models recognized by the service configuration in this repository.
