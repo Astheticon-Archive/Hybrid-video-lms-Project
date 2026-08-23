@@ -1,0 +1,37 @@
+{
+  "services": {
+    "frontend": {
+      "root": ".",
+      "framework": "vite"
+    },
+    "animation-service": {
+      "root": "services/animation-service"
+    },
+    "talking-head-service": {
+      "root": "services/talking-head-service"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/talking-head-service(/.*)?",
+      "destination": {
+        "type": "service",
+        "service": "talking-head-service"
+      }
+    },
+    {
+      "source": "/api/animation-service(/.*)?",
+      "destination": {
+        "type": "service",
+        "service": "animation-service"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "frontend"
+      }
+    }
+  ]
+}
