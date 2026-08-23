@@ -107,3 +107,9 @@ services/animation-service/public/assets/step_*.wav
 .vercel
 .env*
 
+
+# Local talking-head runtime job storage
+services/talking-head-service/storage/
+
+# Windows shortcut files
+*.lnk
