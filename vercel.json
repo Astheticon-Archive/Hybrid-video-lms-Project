@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "services/animation-service/api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/animation-service/(.*)",
+      "dest": "services/animation-service/api/index.js"
+    }
+  ]
+}
