@@ -6,9 +6,10 @@
       "framework": "vite"
     },
     "animation-service": {
-      "root": "services/animation-service",
-      "entrypoint": "src/index.js"
-    },
+  "root": "services/animation-service",
+  "framework": "express",
+  "entrypoint": "src/index.js"
+},
     "talking-head-service": {
       "root": "services/talking-head-service"
     }
