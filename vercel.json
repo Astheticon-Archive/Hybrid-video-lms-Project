@@ -1,40 +1,15 @@
 {
-{
-  "services": {
-    "frontend": {
-      "root": ".",
-      "framework": "vite"
-    },
-    "animation-service": {
-  "root": "services/animation-service",
-  "framework": "express",
-  "entrypoint": "src/index.js"
-},
-    "talking-head-service": {
-      "root": "services/talking-head-service"
+  "version": 2,
+  "builds": [
+    {
+      "src": "services/animation-service/api/index.js",
+      "use": "@vercel/node"
     }
-  },
-  "rewrites": [
+  ],
+  "routes": [
     {
-      "source": "/api/talking-head-service(/.*)?",
-      "destination": {
-        "type": "service",
-        "service": "talking-head-service"
-      }
-    },
-    {
-      "source": "/api/animation-service(/.*)?",
-      "destination": {
-        "type": "service",
-        "service": "animation-service"
-      }
-    },
-    {
-      "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "frontend"
-      }
+      "src": "/api/animation-service/(.*)",
+      "dest": "services/animation-service/api/index.js"
     }
   ]
 }
