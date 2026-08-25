@@ -122,9 +122,7 @@ def normalize_audio(
             check=True,
         )
     except subprocess.CalledProcessError as exc:
-        raise RuntimeError(
-            f"Audio normalization failed: {exc.stderr}"
-        ) from exc
+        raise RuntimeError(f"Audio normalization failed: {exc.stderr}") from exc
 
     if not output_file.exists():
         raise RuntimeError(
