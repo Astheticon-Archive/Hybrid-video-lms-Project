@@ -63,9 +63,7 @@ def _resolve_service_path(path_value: Optional[str]) -> Optional[str]:
         return None
     if isinstance(path_value, (list, tuple)):
         return [
-            _resolve_service_path(str(item))
-            for item in path_value
-            if str(item).strip()
+            _resolve_service_path(str(item)) for item in path_value if str(item).strip()
         ]
 
     candidate = Path(str(path_value))
@@ -125,7 +123,12 @@ def _resolve_checkpoint_path(model_name: str) -> str:
             [
                 str(MODEL_CACHE_DIR / "latentsync" / "latentsync_unet.pt"),
                 str(MODEL_CACHE_DIR / "latentsync" / "latentsync.pth"),
-                str(MODEL_CACHE_DIR / "latentsync" / "checkpoints" / "latentsync_unet.pt"),
+                str(
+                    MODEL_CACHE_DIR
+                    / "latentsync"
+                    / "checkpoints"
+                    / "latentsync_unet.pt"
+                ),
                 str(MODEL_CACHE_DIR / "latentsync" / "checkpoints" / "latest.pth"),
                 str(MODEL_CACHE_DIR / "latentsync" / "model.pth"),
                 str(MODEL_CACHE_DIR / "latentsync" / "checkpoint.pt"),
@@ -158,9 +161,21 @@ def _resolve_whisper_path() -> str:
     if MODEL_CACHE_DIR:
         candidates.extend(
             [
-                str(MODEL_CACHE_DIR / "latentsync" / "checkpoints" / "whisper" / "tiny.pt"),
+                str(
+                    MODEL_CACHE_DIR
+                    / "latentsync"
+                    / "checkpoints"
+                    / "whisper"
+                    / "tiny.pt"
+                ),
                 str(MODEL_CACHE_DIR / "latentsync" / "whisper" / "tiny.pt"),
-                str(MODEL_CACHE_DIR / "latentsync" / "checkpoints" / "whisper" / "small.pt"),
+                str(
+                    MODEL_CACHE_DIR
+                    / "latentsync"
+                    / "checkpoints"
+                    / "whisper"
+                    / "small.pt"
+                ),
             ]
         )
     for candidate in candidates:
@@ -232,18 +247,14 @@ def _merge_audio_chunks(audio_path: str) -> str:
     if isinstance(raw, (list, tuple)):
         chunk_paths = [str(p) for p in raw if str(p).strip()]
         if not chunk_paths:
-            raise PipelineError(
-                "No audio chunk paths were provided for inference."
-            )
+            raise PipelineError("No audio chunk paths were provided for inference.")
         if len(chunk_paths) == 1:
             return chunk_paths[0]
         merged = (
-            Path(tempfile.mkdtemp(prefix="talking_head_audio_"))
-            / "merged_input.wav"
+            Path(tempfile.mkdtemp(prefix="talking_head_audio_")) / "merged_input.wav"
         )
         list_path = (
-            Path(tempfile.mkdtemp(prefix="talking_head_audio_list_"))
-            / "chunks.txt"
+            Path(tempfile.mkdtemp(prefix="talking_head_audio_list_")) / "chunks.txt"
         )
         with list_path.open("w", encoding="utf-8") as handle:
             for chunk in chunk_paths:
@@ -274,7 +285,8 @@ def _merge_audio_chunks(audio_path: str) -> str:
         audio_candidates = [
             p
             for p in chunk_files
-            if p.is_file() and p.suffix.lower() in {".wav", ".mp3", ".ogg", ".flac", ".m4a"}
+            if p.is_file()
+            and p.suffix.lower() in {".wav", ".mp3", ".ogg", ".flac", ".m4a"}
         ]
         if not audio_candidates:
             raise PipelineError(
@@ -300,7 +312,9 @@ def _make_reference_video(image_path: str, output_video_path: str) -> str:
     height, width = frame.shape[:2]
     target_width = max(64, width)
     target_height = max(64, height)
-    reference_fd, reference_path = tempfile.mkstemp(prefix="latentsync_ref_", suffix=".mp4")
+    reference_fd, reference_path = tempfile.mkstemp(
+        prefix="latentsync_ref_", suffix=".mp4"
+    )
     os.close(reference_fd)
     Path(reference_path).parent.mkdir(parents=True, exist_ok=True)
 
@@ -393,9 +407,13 @@ class _OfficialLatentSyncBackend:
         # The official repo constructs the model pipeline explicitly around the UNet,
         # VAE, Whisper audio encoder and scheduler. We intentionally defer the
         # real runtime initialization until the job actually starts and cache it.
-        vae = AutoencoderKL.from_pretrained("stabilityai/sd-vae-ft-mse", torch_dtype=dtype)
+        vae = AutoencoderKL.from_pretrained(
+            "stabilityai/sd-vae-ft-mse", torch_dtype=dtype
+        )
         audio_encoder = Audio2Feature(model_path=self.whisper_path, device=device)
-        unet = UNet3DConditionModel.from_pretrained(self.checkpoint_path, torch_dtype=dtype)
+        unet = UNet3DConditionModel.from_pretrained(
+            self.checkpoint_path, torch_dtype=dtype
+        )
 
         scheduler_source = Path(self.scheduler_config_path)
         if scheduler_source.is_file() and scheduler_source.suffix.lower() == ".json":
@@ -490,7 +508,9 @@ def get_inference_backend(model_name: str):
         ) from exc
 
     if not callable(LipsyncPipeline):
-        raise PipelineError("Official LatentSync pipeline is available but does not expose LipsyncPipeline.")
+        raise PipelineError(
+            "Official LatentSync pipeline is available but does not expose LipsyncPipeline."
+        )
 
     return _OfficialLatentSyncBackend(
         checkpoint_path=checkpoint_path,
@@ -565,9 +585,9 @@ def run_talking_head_pipeline(
         jobs_db[job_id]["status"] = "completed"
         jobs_db[job_id]["progress"] = 100.0
         jobs_db[job_id]["output_url"] = str(Path(backend_output).resolve())
-        jobs_db[job_id]["completed_at"] = datetime.now(
-            timezone.utc
-        ).isoformat().replace("+00:00", "Z")
+        jobs_db[job_id]["completed_at"] = (
+            datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+        )
         jobs_db[job_id]["error_message"] = None
         logger.info(
             f"Pipeline completed successfully for job {job_id}: {backend_output}"
@@ -591,7 +611,5 @@ def run_talking_head_pipeline(
         jobs_db[job_id]["completed_at"] = timestamp
         jobs_db[job_id]["error_message"] = str(exc)
         jobs_db[job_id]["output_url"] = None
-        logger.exception(
-            f"Unexpected pipeline failure for job {job_id}: {exc}"
-        )
+        logger.exception(f"Unexpected pipeline failure for job {job_id}: {exc}")
         return None
