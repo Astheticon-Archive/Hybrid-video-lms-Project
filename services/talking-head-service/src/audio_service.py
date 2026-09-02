@@ -198,18 +198,20 @@ def split_audio_into_chunks(
                 f"Failed to create audio chunk {index}: {exc.stderr}"
             ) from exc
 
-        chunks_meta.append({
-            "index": index,
-            "path": str(chunk_path),
-            "start_ms": start_ms,
-            "end_ms": end_ms,
-            "duration_ms": duration_ms
-        })
+        chunks_meta.append(
+            {
+                "index": index,
+                "path": str(chunk_path),
+                "start_ms": start_ms,
+                "end_ms": end_ms,
+                "duration_ms": duration_ms,
+            }
+        )
 
     return {
         "chunks": chunks_meta,
         "total_duration_ms": total_duration_ms,
-        "chunk_count": number_of_chunks
+        "chunk_count": number_of_chunks,
     }
 
 
@@ -221,15 +223,15 @@ def prepare_audio(
 ) -> dict:
     """
     Prepare input audio for the talking-head inference pipeline.
-    
+
     Validates, normalizes to 16 kHz WAV, and chunks if needed.
-    
+
     Args:
         input_audio_path: Path to user-provided audio file
         job_id: Unique job identifier
         output_base_dir: Base directory for output (job-specific subdirs will be created)
         chunk_duration_seconds: Duration of each chunk in seconds (default 10)
-    
+
     Returns:
         dict matching AUDIO_INTERFACE.md:
         {
@@ -247,27 +249,27 @@ def prepare_audio(
                 ...
             ]
         }
-    
+
     Raises:
         FileNotFoundError: Input file not found
         ValueError: Invalid or empty audio file
         RuntimeError: Normalization or chunking failed
     """
-    
+
     # Step 1: Validate input
     validate_audio_with_ffprobe(input_audio_path)
-    
+
     # Step 2: Create job-specific output directory
     job_audio_dir = Path(output_base_dir) / job_id / "audio"
     job_audio_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Step 3: Normalize audio
     normalized_output_path = str(job_audio_dir / "normalized_audio.wav")
     normalize_result = normalize_audio(input_audio_path, normalized_output_path)
-    
+
     # Step 4: Get total duration
     total_duration_ms = int(normalize_result["duration"] * 1000)
-    
+
     # Step 5: Chunk if necessary
     if total_duration_ms <= chunk_duration_seconds * 1000:
         # Short audio: no chunking
@@ -275,19 +277,19 @@ def prepare_audio(
             "is_chunked": False,
             "normalized_audio_path": normalized_output_path,
             "total_duration_ms": total_duration_ms,
-            "chunks": []
+            "chunks": [],
         }
     else:
         # Long audio: chunk it
         chunk_result = split_audio_into_chunks(
             audio_path=normalized_output_path,
             output_dir=str(job_audio_dir),
-            chunk_duration=chunk_duration_seconds
+            chunk_duration=chunk_duration_seconds,
         )
-        
+
         return {
             "is_chunked": True,
             "normalized_audio_path": normalized_output_path,
             "total_duration_ms": total_duration_ms,
-            "chunks": chunk_result["chunks"]
+            "chunks": chunk_result["chunks"],
         }
